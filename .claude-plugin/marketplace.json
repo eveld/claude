@@ -6,7 +6,7 @@
   "plugins": [
     {
       "name": "eveld-workflows",
-      "source": ".",
+      "source": "./",
       "description": "Custom research, planning, and implementation workflows with agent-awareness",
       "version": "1.0.0"
     }
