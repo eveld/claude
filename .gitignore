@@ -1,0 +1,18 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Backup directories (created by switch script)
+.claude.backup/
+.claude.old/
+
+# Temporary files
+*.tmp
+*.log

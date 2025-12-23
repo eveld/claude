@@ -1,0 +1,9 @@
+{
+  "name": "eveld-workflows",
+  "description": "Custom research, planning, and implementation workflows with agent-awareness",
+  "author": {
+    "name": "Erik Veld",
+    "email": "erik@instruqt.com"
+  },
+  "version": "1.0.0"
+}

@@ -1,0 +1,14 @@
+{
+  "name": "eveld-claude",
+  "owner": {
+    "name": "Erik Veld"
+  },
+  "plugins": [
+    {
+      "name": "eveld-workflows",
+      "source": ".",
+      "description": "Custom research, planning, and implementation workflows with agent-awareness",
+      "version": "1.0.0"
+    }
+  ]
+}
