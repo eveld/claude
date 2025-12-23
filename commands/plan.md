@@ -24,38 +24,45 @@ Tip: You can invoke with a file: `/plan thoughts/tickets/eng_1234.md`
 - Read ticket and any mentioned files FULLY (no limit/offset)
 - Read in main context before spawning agents
 
-### Step 2: Initial Research
+### Step 2: Discover Project Context (if needed)
+- Check if `thoughts/notes/commands.md` exists
+  - If not: Use `discover-project-commands` skill to create it
+- Check if `thoughts/notes/testing.md` exists
+  - If not: Use `discover-test-patterns` skill to create it
+- These reference docs improve plan quality and success criteria
+
+### Step 3: Initial Research
 - Use `spawn-planning-agents` skill to gather context
 - Spawn parallel agents to find existing code, patterns, documentation
 - Wait for all agents to complete
 
-### Step 3: Read Agent Findings
+### Step 4: Read Agent Findings
 - Read all files identified by research agents FULLY
 - Verify understanding against actual code
 
-### Step 4: Ask Clarifying Questions
+### Step 5: Ask Clarifying Questions
 - Present informed understanding
 - Ask only questions that code can't answer
 - Use AskUserQuestion tool for technical choices
 
-### Step 5: Deeper Research (if needed)
+### Step 6: Deeper Research (if needed)
 - If user corrects misunderstanding, spawn new research
 - Verify facts before proceeding
 
-### Step 6: Collaborate on Approach
+### Step 7: Collaborate on Approach
 - Present design options with pros/cons
 - Get user buy-in on structure
 - Agree on phases before writing
 
-### Step 7: Gather Metadata
+### Step 8: Gather Metadata
 - Use `gather-project-metadata` skill
 
-### Step 8: Write Plan
+### Step 9: Write Plan
 - Use `write-plan-doc` skill to create structured plan
 - File path: `thoughts/shared/plans/YYYY-MM-DD-NN-description.md`
 - Reference templates for structure
 
-### Step 9: Review and Iterate
+### Step 10: Review and Iterate
 - Present plan location
 - Ask for feedback on phases, success criteria, technical details
 - Iterate until user is satisfied

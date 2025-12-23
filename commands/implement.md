@@ -22,9 +22,13 @@ Example: `/implement thoughts/shared/plans/2025-12-23-01-feature-name.md`
 - Check for existing checkboxes (may be partially complete)
 - Understand all phases and success criteria
 
-### Step 2: Read Reference Documents
-- Read `thoughts/notes/commands.md` (if referenced in plan)
-- Read `thoughts/notes/testing.md` (if referenced in plan)
+### Step 2: Read/Create Reference Documents
+- Check if plan references `thoughts/notes/commands.md`
+  - If yes and exists: Read it
+  - If yes but doesn't exist: Use `discover-project-commands` skill to create it, then read it
+- Check if plan references `thoughts/notes/testing.md`
+  - If yes and exists: Read it
+  - If yes but doesn't exist: Use `discover-test-patterns` skill to create it, then read it
 - These documents inform verification and testing
 
 ### Step 3: Implement Phase by Phase
