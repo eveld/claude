@@ -39,6 +39,23 @@ You have access to specialized agents that are MORE EFFICIENT than basic tools. 
 - Only when user explicitly asks for web research
 - Example: "Research how JWT tokens work"
 
+**Analyzing complex errors or stack traces?**
+→ Use `error-analyzer` agent
+- Better than: Reading multiple files manually to understand error
+- Example: "Analyze this panic: nil pointer dereference at handler.go:42"
+
+## Available Agents
+
+| Task Type | Use This subagent_type |
+|-----------|----------------------|
+| Finding files/components | `codebase-locator` |
+| Understanding code | `codebase-analyzer` |
+| Finding similar patterns | `codebase-pattern-finder` |
+| Finding documentation | `thoughts-locator` |
+| Analyzing documents | `thoughts-analyzer` |
+| Web research | `web-search-researcher` |
+| Analyzing errors | `error-analyzer` |
+
 ## When to Use Agents
 
 ### ALWAYS Use Agents For:
