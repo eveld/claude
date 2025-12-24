@@ -7,8 +7,8 @@
     {
       "name": "workflows",
       "source": "./",
-      "description": "Custom research, planning, and implementation workflows with agent-awareness",
-      "version": "1.0.0"
+      "description": "Custom research, planning, and implementation workflows with agent-awareness and platform debugging orchestration (GCP, Kubernetes, Instruqt, Linear)",
+      "version": "1.2.0"
     }
   ]
 }

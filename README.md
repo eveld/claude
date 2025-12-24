@@ -129,6 +129,33 @@ User: "Find all authentication code"
 Claude: [Uses codebase-locator agent automatically]
 ```
 
+**Platform debugging**:
+```
+User: "Get details for Linear ticket ENG-1234"
+Claude: [Uses linear-awareness → query-linear-issues skill]
+
+User: "Show me GCP errors for api-gateway"
+Claude: [Uses gcp-awareness → query-gcp-logs skill]
+
+User: "Check if production pods are running"
+Claude: [Uses k8s-awareness → query-kubernetes skill]
+
+User: "Debug the crashing pod api-gateway-xyz"
+Claude: [Uses k8s-awareness → debug-kubernetes-container skill]
+
+User: "Add my findings to ENG-1234"
+Claude: [Uses linear-awareness → update-linear-issue skill]
+
+User: "Investigate ENG-1234"
+Claude: [Uses debugging-awareness → investigate-platform-issue workflow]
+
+User: "Add recent errors to the ticket"
+Claude: [Uses debugging-awareness → enrich-linear-from-logs skill]
+
+User: "Find logs for trace xyz"
+Claude: [Uses debugging-awareness → correlate-logs-traces skill]
+```
+
 **Creating documents**:
 ```
 User: "Can you document these findings?"
@@ -162,7 +189,7 @@ github.com/eveld/claude/
 │   ├── research.md
 │   ├── plan.md
 │   └── implement.md
-├── skills/                  # Reusable capabilities (16)
+├── skills/                  # Reusable capabilities (31)
 │   ├── agent-awareness/
 │   ├── before-file-search/
 │   ├── before-code-analysis/
@@ -178,7 +205,22 @@ github.com/eveld/claude/
 │   ├── verify-implementation/
 │   ├── write-commit-message/
 │   ├── write-pr-description/
-│   └── debug-systematically/
+│   ├── debug-systematically/
+│   ├── gcp-awareness/           # NEW: Phase 1
+│   ├── k8s-awareness/           # NEW: Phase 1
+│   ├── instruqt-awareness/      # NEW: Phase 1
+│   ├── linear-awareness/        # NEW: Phase 1
+│   ├── debugging-awareness/     # NEW: Phase 1
+│   ├── query-gcp-logs/          # NEW: Phase 1
+│   ├── query-kubernetes/        # NEW: Phase 1
+│   ├── query-instruqt-tracks/   # NEW: Phase 1
+│   ├── query-instruqt-labs/     # NEW: Phase 1
+│   ├── query-linear-issues/     # NEW: Phase 1
+│   ├── update-linear-issue/     # NEW: Phase 1
+│   ├── debug-kubernetes-container/  # NEW: Phase 1
+│   ├── investigate-platform-issue/  # NEW: Phase 2
+│   ├── enrich-linear-from-logs/     # NEW: Phase 2
+│   └── correlate-logs-traces/       # NEW: Phase 2
 ├── templates/               # Document templates (4)
 │   ├── research-document.md
 │   ├── plan-document.md
@@ -207,13 +249,18 @@ github.com/eveld/claude/
 
 ### Three Tiers of Skills
 
-**Tier 1 - Agent Awareness** (Fix discovery):
-- `agent-awareness` - Master guide
+**Tier 1 - Agent Awareness & Platform Discovery** (Fix discovery):
+- `agent-awareness` - Master guide for codebase agents
 - `before-file-search` - Intercept grep/glob
 - `before-code-analysis` - Intercept file reading
 - `before-spawning-task` - Ensure correct agent
+- `gcp-awareness` - Guide for GCP debugging skills
+- `k8s-awareness` - Guide for Kubernetes debugging skills
+- `instruqt-awareness` - Guide for Instruqt platform skills
+- `linear-awareness` - Guide for Linear ticket management skills
+- `debugging-awareness` - Master platform debugging workflow
 
-**Tier 2 - Core Workflows** (Enable commands):
+**Tier 2 - Core Workflows & Platform Tools** (Enable commands and debugging):
 - `spawn-research-agents` - Research orchestration
 - `spawn-planning-agents` - Planning orchestration
 - `write-research-doc` - Research formatting
@@ -224,6 +271,16 @@ github.com/eveld/claude/
 - `write-commit-message` - Conventional commits
 - `write-pr-description` - Structured PRs
 - `debug-systematically` - Systematic debugging
+- `query-gcp-logs` - GCP Cloud Logging queries
+- `query-kubernetes` - Kubernetes resource queries
+- `query-instruqt-tracks` - Instruqt track operations
+- `query-instruqt-labs` - Instruqt lab operations
+- `query-linear-issues` - Linear issue/ticket queries
+- `update-linear-issue` - Linear issue updates
+- `debug-kubernetes-container` - K8s debug containers
+- `investigate-platform-issue` - Platform issue investigation workflow
+- `enrich-linear-from-logs` - Add log findings to tickets
+- `correlate-logs-traces` - Trace-to-log correlation
 
 **Tier 3 - Supporting** (Utilities):
 - `gather-project-metadata` - Collect git info
