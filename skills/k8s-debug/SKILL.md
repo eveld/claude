@@ -1,5 +1,5 @@
 ---
-name: debug-kubernetes-container
+name: k8s-debug
 description: Launch ephemeral debug container in running pod for interactive debugging. Use when you need to debug a pod without restarting it.
 ---
 

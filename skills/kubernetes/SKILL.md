@@ -1,5 +1,5 @@
 ---
-name: query-kubernetes
+name: kubernetes
 description: Query Kubernetes resources (pods, deployments, services, events). Use when checking cluster state and resource status.
 ---
 

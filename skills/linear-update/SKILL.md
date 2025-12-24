@@ -1,5 +1,5 @@
 ---
-name: update-linear-issue
+name: linear-update
 description: Update Linear issues with debugging findings. Add comments, change status, update labels, set priority. Use after completing investigations.
 ---
 

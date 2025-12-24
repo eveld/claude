@@ -9,32 +9,62 @@ You have specialized Linear issue management skills. Use these for structured ti
 
 ## Decision Tree
 
-**Fetching ticket details for debugging context?**
-→ Use `query-linear-issues` skill
-- Better than: Running raw `linearis issues read` commands
-- Example: "Get details for ENG-1234"
+### Skills vs Agents
 
-**Searching for related issues?**
-→ Use `query-linear-issues` skill
-- Includes: search, list commands
-- Example: "Find issues about api-gateway errors"
+**Simple issue fetch or update?**
+→ Use Linear skills
+- `linear-issues` - Fetch, list, search issues (single linearis command)
+- `linear-update` - Update issue, add comments
+- Example: "Get details for ENG-1234"
+- Use when: Single issue, straightforward query/update
+
+**Complex investigation requiring analysis?**
+→ Use Task tool with Linear agents (conserves context)
+- `linear-locator` - Find issues by criteria, save to /tmp
+- `linear-analyzer` - Extract debugging context, parse technical details
+- `linear-pattern-finder` - Find patterns across issues, detect recurring problems
+- Use when: Multi-issue analysis, pattern detection, trend analysis
+
+### When to Use Which Agent
+
+**Just need to find issues broadly?**
+→ Use `linear-locator` agent only
+- Lists/searches issues by team, label, state, text
+- Saves filtered results to /tmp
+- Example: "Find all FileB-related issues across teams"
+
+**Investigating single issue for debugging?**
+→ Use `linear-locator` + `linear-analyzer` agents
+- Locator: Find issue and related issues
+- Analyzer: Extract error messages, URLs, technical details
+- Example: "Analyze ENG-1234 for debugging context"
+
+**Need to find patterns or recurring problems?**
+→ Use all three: `linear-locator` + `linear-analyzer` + `linear-pattern-finder`
+- Locator: Fetch issues by criteria
+- Analyzer: Parse each issue for technical details
+- Pattern-finder: Correlate across issues, find recurring themes, temporal trends
+- Example: "Find recurring VCS permission errors across last 2 months"
 
 **Adding debugging findings to a ticket?**
-→ Use `update-linear-issue` skill
+→ Use `linear-update` skill
 - Better than: Running raw `linearis comments create` commands
 - Example: "Add root cause analysis to ENG-1234"
 
 **Updating issue status after investigation?**
-→ Use `update-linear-issue` skill
+→ Use `linear-update` skill
 - Includes: status, priority, labels updates
 - Example: "Mark ENG-1234 as In Progress"
 
-## Available Linear Skills
+## Available Linear Tools
 
-| Purpose | Skill |
-|---------|-------|
-| Fetch, list, search issues | query-linear-issues |
-| Update issues, add comments | update-linear-issue |
+| Type | Name | Purpose |
+|------|------|---------|
+| Skill | linear-issues | Simple queries (single linearis command) |
+| Skill | linear-update | Update issues, add comments |
+| Agent | linear-locator | Find issues by criteria across teams |
+| Agent | linear-analyzer | Extract debugging context from issues |
+| Agent | linear-pattern-finder | Find patterns, recurring problems, trends |
 
 ## When to Use Raw linearis
 
@@ -50,11 +80,11 @@ For systematic ticket workflows (read → debug → update), use the specialized
 ## Common linearis Commands
 
 **Covered by skills**:
-- `linearis issues read` → Use `query-linear-issues`
-- `linearis issues list` → Use `query-linear-issues`
-- `linearis issues search` → Use `query-linear-issues`
-- `linearis comments create` → Use `update-linear-issue`
-- `linearis issues update` → Use `update-linear-issue`
+- `linearis issues read` → Use `linear-issues`
+- `linearis issues list` → Use `linear-issues`
+- `linearis issues search` → Use `linear-issues`
+- `linearis comments create` → Use `linear-update`
+- `linearis issues update` → Use `linear-update`
 
 **Not covered yet** (use directly):
 - `linearis issues create` (issue creation)
@@ -75,15 +105,15 @@ Note: Set `LINEARIS_API_TOKEN` environment variable or use `--api-token` flag.
 Linear skills integrate with platform debugging:
 
 **Workflow**:
-1. `query-linear-issues` → Fetch ticket context
+1. `linear-issues` → Fetch ticket context
 2. `debugging-awareness` → Systematic investigation (GCP + K8s + Instruqt)
-3. `update-linear-issue` → Add findings to ticket
-4. `update-linear-issue` → Update status to "Done"
+3. `linear-update` → Add findings to ticket
+4. `linear-update` → Update status to "Done"
 
 **Example**:
 ```
 User: "Debug issue ENG-1234"
-Claude: [Checks linear-awareness] → Uses query-linear-issues
+Claude: [Checks linear-awareness] → Uses linear-issues
         [Checks debugging-awareness] → Uses GCP/K8s/Instruqt skills
-        [Checks linear-awareness] → Uses update-linear-issue
+        [Checks linear-awareness] → Uses linear-update
 ```

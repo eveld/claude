@@ -9,27 +9,56 @@ You have specialized Kubernetes debugging skills. Use these instead of raw kubec
 
 ## Decision Tree
 
-**Checking if pods are running?**
-→ Use `query-kubernetes` skill
+### Skills vs Agents
+
+**Simple, single kubectl command query?**
+→ Use `kubernetes` skill
 - Better than: Running raw `kubectl get pods` commands
 - Example: "Check pod status in production namespace"
+- Use when: Quick resource check, single namespace, no correlation needed
 
-**Need to view pod logs or events?**
-→ Use `query-kubernetes` skill
-- Includes: logs, describe, events commands
-- Example: "Get logs from api-gateway pod"
+**Complex investigation requiring multiple steps?**
+→ Use Task tool with K8s agents (conserves context)
+- `k8s-locator` - Find and list resources across namespaces
+- `k8s-analyzer` - Diagnose pod/deployment issues, check logs/events
+- `k8s-pattern-finder` - Find patterns across resources, detect infrastructure issues
+- Use when: Multi-namespace investigation, pattern detection, cluster-wide issues
 
 **Specific pod crashing or failing?**
-→ Use `debug-kubernetes-container` skill
+→ Use `k8s-debug` skill
 - Launches ephemeral debug container in running pod
 - Example: "Debug the failing pod api-gateway-xyz"
 
-## Available Kubernetes Skills
+### When to Use Which Agent
 
-| Purpose | Skill |
-|---------|-------|
-| Query resources (pods, deployments, services) | query-kubernetes |
-| Debug live pods with ephemeral containers | debug-kubernetes-container |
+**Just need to find resources broadly?**
+→ Use `k8s-locator` agent only
+- Lists pods, deployments, services across namespaces
+- Saves to /tmp for later analysis
+- Example: "Get all pods in vcs, integrations, core namespaces"
+
+**Investigating single pod/service issue?**
+→ Use `k8s-locator` + `k8s-analyzer` agents
+- Locator: Find relevant pods/resources
+- Analyzer: Diagnose health, check events, analyze logs
+- Example: "Debug vcs-storage CrashLoopBackOff"
+
+**Need to find patterns or cluster-wide issues?**
+→ Use all three: `k8s-locator` + `k8s-analyzer` + `k8s-pattern-finder`
+- Locator: Fetch resources from all namespaces
+- Analyzer: Diagnose specific pod failures
+- Pattern-finder: Correlate across resources, detect node issues, cascade failures
+- Example: "Find why multiple pods are ImagePullBackOff across namespaces"
+
+## Available Kubernetes Tools
+
+| Type | Name | Purpose |
+|------|------|---------|
+| Skill | kubernetes | Simple queries (single kubectl command) |
+| Skill | k8s-debug | Launch ephemeral debug container |
+| Agent | k8s-locator | Find and list resources across namespaces |
+| Agent | k8s-analyzer | Diagnose pod/deployment issues |
+| Agent | k8s-pattern-finder | Find patterns, cluster-wide issues |
 
 ## When to Use Raw kubectl
 
@@ -43,10 +72,10 @@ For systematic Kubernetes work, use the specialized skills above.
 ## Common kubectl Commands
 
 **Covered by skills**:
-- `kubectl get` → Use `query-kubernetes`
-- `kubectl describe` → Use `query-kubernetes`
-- `kubectl logs` → Use `query-kubernetes`
-- `kubectl debug` → Use `debug-kubernetes-container`
+- `kubectl get` → Use `kubernetes`
+- `kubectl describe` → Use `kubernetes`
+- `kubectl logs` → Use `kubernetes`
+- `kubectl debug` → Use `k8s-debug`
 
 **Not covered yet** (use directly):
 - `kubectl apply`, `kubectl delete`, `kubectl edit` (destructive operations)

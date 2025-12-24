@@ -11,6 +11,8 @@ Custom research, planning, and implementation workflows for Claude Code with int
 
 ### Intelligent Agent Awareness
 Claude automatically uses specialized agents instead of basic tools:
+
+**Codebase Agents:**
 - `codebase-locator` - Find WHERE code lives
 - `codebase-analyzer` - Understand HOW code works
 - `codebase-pattern-finder` - Find similar implementations
@@ -18,6 +20,16 @@ Claude automatically uses specialized agents instead of basic tools:
 - `thoughts-analyzer` - Extract insights from docs
 - `web-search-researcher` - External research
 - `error-analyzer` - Deep error analysis
+
+**Platform Debugging Agents** (conserve context during complex investigations):
+- `gcp-locator` / `gcp-analyzer` / `gcp-pattern-finder` - GCP Cloud Logging analysis
+- `k8s-locator` / `k8s-analyzer` / `k8s-pattern-finder` - Kubernetes diagnostics
+- `linear-locator` / `linear-analyzer` / `linear-pattern-finder` - Linear issue analysis
+
+Each domain follows 3-stage pipeline:
+1. **Locator** - Fetch data broadly (logs, resources, issues)
+2. **Analyzer** - Filter and diagnose specific services/resources
+3. **Pattern-finder** - Correlate across multiple sources, find patterns
 
 ### New Capabilities
 - Project command discovery → `thoughts/notes/commands.md`
@@ -132,28 +144,28 @@ Claude: [Uses codebase-locator agent automatically]
 **Platform debugging**:
 ```
 User: "Get details for Linear ticket ENG-1234"
-Claude: [Uses linear-awareness → query-linear-issues skill]
+Claude: [Uses linear-awareness → linear-issues skill]
 
 User: "Show me GCP errors for api-gateway"
-Claude: [Uses gcp-awareness → query-gcp-logs skill]
+Claude: [Uses gcp-awareness → gcp-logs skill]
 
 User: "Check if production pods are running"
-Claude: [Uses k8s-awareness → query-kubernetes skill]
+Claude: [Uses k8s-awareness → kubernetes skill]
 
 User: "Debug the crashing pod api-gateway-xyz"
-Claude: [Uses k8s-awareness → debug-kubernetes-container skill]
+Claude: [Uses k8s-awareness → k8s-debug skill]
 
 User: "Add my findings to ENG-1234"
-Claude: [Uses linear-awareness → update-linear-issue skill]
+Claude: [Uses linear-awareness → linear-update skill]
 
-User: "Investigate ENG-1234"
-Claude: [Uses debugging-awareness → investigate-platform-issue workflow]
+User: "Investigate production errors across vcs-service and backend"
+Claude: [Uses debugging-awareness → spawns gcp-locator + gcp-analyzer + gcp-pattern-finder agents]
 
-User: "Add recent errors to the ticket"
-Claude: [Uses debugging-awareness → enrich-linear-from-logs skill]
+User: "Find why multiple pods are ImagePullBackOff"
+Claude: [Uses k8s-awareness → spawns k8s-locator + k8s-pattern-finder agents]
 
-User: "Find logs for trace xyz"
-Claude: [Uses debugging-awareness → correlate-logs-traces skill]
+User: "Find recurring VCS permission errors in Linear"
+Claude: [Uses linear-awareness → spawns linear-locator + linear-pattern-finder agents]
 ```
 
 **Creating documents**:
@@ -177,19 +189,28 @@ github.com/eveld/claude/
 ├── .claude-plugin/          # Plugin metadata
 │   ├── plugin.json
 │   └── marketplace.json
-├── agents/                  # Specialized subagents (7)
+├── agents/                  # Specialized subagents (17)
 │   ├── codebase-locator.md
 │   ├── codebase-analyzer.md
 │   ├── codebase-pattern-finder.md
 │   ├── thoughts-locator.md
 │   ├── thoughts-analyzer.md
 │   ├── web-search-researcher.md
-│   └── error-analyzer.md
+│   ├── error-analyzer.md
+│   ├── gcp-locator.md          # NEW: Platform debugging
+│   ├── gcp-analyzer.md         # NEW: Platform debugging
+│   ├── gcp-pattern-finder.md   # NEW: Platform debugging
+│   ├── k8s-locator.md          # NEW: Platform debugging
+│   ├── k8s-analyzer.md         # NEW: Platform debugging
+│   ├── k8s-pattern-finder.md   # NEW: Platform debugging
+│   ├── linear-locator.md       # NEW: Platform debugging
+│   ├── linear-analyzer.md      # NEW: Platform debugging
+│   └── linear-pattern-finder.md # NEW: Platform debugging
 ├── commands/                # Workflow orchestration (3)
 │   ├── research.md
 │   ├── plan.md
 │   └── implement.md
-├── skills/                  # Reusable capabilities (31)
+├── skills/                  # Reusable capabilities (30)
 │   ├── agent-awareness/
 │   ├── before-file-search/
 │   ├── before-code-analysis/
@@ -206,21 +227,20 @@ github.com/eveld/claude/
 │   ├── write-commit-message/
 │   ├── write-pr-description/
 │   ├── debug-systematically/
-│   ├── gcp-awareness/           # NEW: Phase 1
-│   ├── k8s-awareness/           # NEW: Phase 1
-│   ├── instruqt-awareness/      # NEW: Phase 1
-│   ├── linear-awareness/        # NEW: Phase 1
-│   ├── debugging-awareness/     # NEW: Phase 1
-│   ├── query-gcp-logs/          # NEW: Phase 1
-│   ├── query-kubernetes/        # NEW: Phase 1
-│   ├── query-instruqt-tracks/   # NEW: Phase 1
-│   ├── query-instruqt-labs/     # NEW: Phase 1
-│   ├── query-linear-issues/     # NEW: Phase 1
-│   ├── update-linear-issue/     # NEW: Phase 1
-│   ├── debug-kubernetes-container/  # NEW: Phase 1
-│   ├── investigate-platform-issue/  # NEW: Phase 2
-│   ├── enrich-linear-from-logs/     # NEW: Phase 2
-│   └── correlate-logs-traces/       # NEW: Phase 2
+│   ├── gcp-awareness/           # Platform debugging
+│   ├── k8s-awareness/           # Platform debugging
+│   ├── instruqt-awareness/      # Platform debugging
+│   ├── instruqt-cli-awareness/  # Platform debugging
+│   ├── instruqt-platform-awareness/  # Platform debugging
+│   ├── linear-awareness/        # Platform debugging
+│   ├── debugging-awareness/     # Platform debugging
+│   ├── gcp-logs/          # Platform debugging
+│   ├── kubernetes/        # Platform debugging
+│   ├── instruqt-tracks/   # Platform debugging
+│   ├── instruqt-labs/     # Platform debugging
+│   ├── linear-issues/     # Platform debugging
+│   ├── linear-update/     # Platform debugging
+│   └── k8s-debug/  # Platform debugging
 ├── templates/               # Document templates (4)
 │   ├── research-document.md
 │   ├── plan-document.md
@@ -271,16 +291,13 @@ github.com/eveld/claude/
 - `write-commit-message` - Conventional commits
 - `write-pr-description` - Structured PRs
 - `debug-systematically` - Systematic debugging
-- `query-gcp-logs` - GCP Cloud Logging queries
-- `query-kubernetes` - Kubernetes resource queries
-- `query-instruqt-tracks` - Instruqt track operations
-- `query-instruqt-labs` - Instruqt lab operations
-- `query-linear-issues` - Linear issue/ticket queries
-- `update-linear-issue` - Linear issue updates
-- `debug-kubernetes-container` - K8s debug containers
-- `investigate-platform-issue` - Platform issue investigation workflow
-- `enrich-linear-from-logs` - Add log findings to tickets
-- `correlate-logs-traces` - Trace-to-log correlation
+- `gcp-logs` - GCP Cloud Logging queries
+- `kubernetes` - Kubernetes resource queries
+- `instruqt-tracks` - Instruqt track operations
+- `instruqt-labs` - Instruqt lab operations
+- `linear-issues` - Linear issue/ticket queries
+- `linear-update` - Linear issue updates
+- `k8s-debug` - K8s debug containers
 
 **Tier 3 - Supporting** (Utilities):
 - `gather-project-metadata` - Collect git info
