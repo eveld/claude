@@ -22,7 +22,7 @@ ln -s $(pwd) ~/.claude/plugins/workflows
 ## Commands
 
 - **`/workflows:research <question>`** - Research codebase using parallel agents, save to `thoughts/shared/research/`
-- **`/workflows:plan <ticket-file>`** - Create implementation plan, auto-discover project commands/tests, save to `thoughts/shared/plans/`
+- **`/workflows:plan <research-file>`** - Create implementation plan, auto-discover project commands/tests, save to `thoughts/shared/plans/`
 - **`/workflows:implement <plan-file>`** - Execute plan phase by phase with verification
 
 ## Skills (24)
