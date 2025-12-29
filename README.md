@@ -52,14 +52,19 @@ git clone https://github.com/eveld/claude.git
 cd claude
 ```
 
-2. **Switch to new setup**:
+2. **Install the plugin**:
 ```bash
-./scripts/switch-setup.sh new
+# Copy to Claude plugins directory
+cp -r . ~/.claude/plugins/workflows/
+
+# Or use symlink for development
+ln -s $(pwd) ~/.claude/plugins/workflows
 ```
 
 3. **Verify installation**:
 ```bash
-./scripts/switch-setup.sh status
+# Check skills are available
+ls ~/.claude/plugins/workflows/skills/
 ```
 
 ### Installation via Plugin System (Future)
@@ -254,13 +259,11 @@ github.com/eveld/claude/
 │   ├── linear-awareness/
 │   ├── linear-issues/
 │   └── linear-update/
-├── templates/               # Document templates (4)
-│   ├── research-document.md
-│   ├── plan-document.md
-│   ├── commands-reference.md
-│   └── testing-reference.md
-└── scripts/                 # Utility scripts
-    └── switch-setup.sh
+└── templates/               # Document templates (4)
+    ├── research-document.md
+    ├── plan-document.md
+    ├── commands-reference.md
+    └── testing-reference.md
 ```
 
 ### How It Works
@@ -313,47 +316,27 @@ github.com/eveld/claude/
 - `gather-project-metadata` - Collect git info
 - `verify-implementation` - Run verification
 
-## Rollback
-
-If you need to switch back to the old setup:
-
-```bash
-./scripts/switch-setup.sh old
-```
-
-This restores your previous `~/.claude/` configuration.
-
-To check current status:
-
-```bash
-./scripts/switch-setup.sh status
-```
-
 ## Troubleshooting
 
 ### Claude still using grep/glob instead of agents
 
 1. Check skills are installed:
 ```bash
-ls ~/.claude/skills/*/SKILL.md
+ls ~/.claude/plugins/workflows/skills/*/SKILL.md
 ```
 
 2. Verify agent-awareness skill exists:
 ```bash
-cat ~/.claude/skills/agent-awareness/SKILL.md
+cat ~/.claude/plugins/workflows/skills/agent-awareness/SKILL.md
 ```
 
-3. Try switching again:
-```bash
-./scripts/switch-setup.sh old
-./scripts/switch-setup.sh new
-```
+3. Restart Claude Code to reload the plugin
 
 ### Commands not found
 
-Verify commands are installed:
+Verify plugin is installed:
 ```bash
-ls ~/.claude/commands/
+ls ~/.claude/plugins/workflows/commands/
 ```
 
 Should show: `research.md`, `plan.md`, `implement.md`
