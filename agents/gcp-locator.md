@@ -78,14 +78,14 @@ gcloud logging read 'FILTER' \
 ```bash
 # Single service
 gcloud logging read \
-  'resource.labels.container_name="vcs-storage"' \
+  'resource.labels.container_name="service-b"' \
   --limit=500 \
   --format=json \
-  --project=instruqt-dev > /tmp/vcs-storage-logs.json
+  --project=example-dev > /tmp/service-b-logs.json
 
 # Multiple services (run separate queries)
-gcloud logging read 'resource.labels.container_name="vcs-storage"' --limit=500 --format=json > /tmp/vcs-storage.json
-gcloud logging read 'resource.labels.container_name="vcs-service"' --limit=500 --format=json > /tmp/vcs-service.json
+gcloud logging read 'resource.labels.container_name="service-b"' --limit=500 --format=json > /tmp/service-b.json
+gcloud logging read 'resource.labels.container_name="service-a"' --limit=500 --format=json > /tmp/service-a.json
 ```
 
 ### Logs by Severity and Time
@@ -134,22 +134,22 @@ Structure your response like this:
 ## GCP Logs/Resources Located
 
 ### Query Summary
-- **Services**: vcs-storage, vcs-service, integrations-salesforce
+- **Services**: service-b, service-a, integrations-service-c
 - **Time range**: 2025-12-24 10:00 - 11:00 UTC (1 hour)
 - **Severity**: ERROR and above
-- **Project**: instruqt-dev
+- **Project**: example-dev
 
 ### Results Fetched
 
-#### vcs-storage logs
-- **File**: `/tmp/vcs-storage-logs-20251224-110530.json`
+#### service-b logs
+- **File**: `/tmp/service-b-logs-20251224-110530.json`
 - **Count**: 487 log entries
-- **Query**: `resource.labels.container_name="vcs-storage" AND severity>=ERROR AND timestamp>="2025-12-24T10:00:00Z"`
+- **Query**: `resource.labels.container_name="service-b" AND severity>=ERROR AND timestamp>="2025-12-24T10:00:00Z"`
 
-#### vcs-service logs
-- **File**: `/tmp/vcs-service-logs-20251224-110532.json`
+#### service-a logs
+- **File**: `/tmp/service-a-logs-20251224-110532.json`
 - **Count**: 123 log entries
-- **Query**: `resource.labels.container_name="vcs-service" AND severity>=ERROR AND timestamp>="2025-12-24T10:00:00Z"`
+- **Query**: `resource.labels.container_name="service-a" AND severity>=ERROR AND timestamp>="2025-12-24T10:00:00Z"`
 
 #### IAM Configuration
 - **File**: `/tmp/role-vcs_role-20251224-110535.json`
@@ -181,9 +181,9 @@ CURRENT_PROJECT=$(gcloud config get-value project 2>/dev/null)
 echo "Current GCP Project: $CURRENT_PROJECT"
 
 # Switch if needed
-gcloud config set project instruqt-dev
+gcloud config set project example-dev
 # or
-gcloud config set project instruqt-prod
+gcloud config set project example-prod
 ```
 
 ## What NOT to Do

@@ -151,7 +151,7 @@ linearis issues list --limit 200 | jq '[.[] | select(.team.key == "ENG" and (.la
 
 ```bash
 # Find issues containing Slack/Unthread links (support tickets)
-linearis issues list --limit 200 | jq '[.[] | select(has("description") and (.description | contains("instruqt.slack.com") or contains("unthread.io")))]'
+linearis issues list --limit 200 | jq '[.[] | select(has("description") and (.description | contains("example.slack.com") or contains("unthread.io")))]'
 
 # Find issues mentioning specific error messages
 linearis issues list --limit 200 | jq '[.[] | select(has("description") and (.description | contains("host for this script was not found")))]'
@@ -229,15 +229,15 @@ linearis issues list --limit 50 | jq -r '.[] | [
 # Issues with Unthread/Slack links (likely support tickets)
 linearis issues list --limit 200 | jq '[.[] | select(has("description") and (.description | contains("unthread.io") or contains("slack.com")))]' > /tmp/support-tickets.json
 
-# Issues from specific team (e.g., INS = Instruqt support team)
-linearis issues list --limit 200 | jq '[.[] | select(.team.key == "INS")]'
+# Issues from specific team (e.g., support team)
+linearis issues list --limit 200 | jq '[.[] | select(.team.key == "SUPPORT")]'
 
 # Issues with specific labels indicating support work
 linearis issues list --limit 200 | jq '[.[] | select(.labels[]?.name == "Support" or .labels[]?.name == "Bug")]'
 
 # Combine: Support team + Slack links + In Progress
 linearis issues list --limit 200 | jq '[.[] | select(
-  .team.key == "INS" and
+  .team.key == "SUPPORT" and
   .state.name == "In Progress" and
   (has("description") and (.description | contains("slack.com")))
 )]'

@@ -129,7 +129,7 @@ Identified 3 major patterns: (1) VCS permission errors recurring across 8 issues
 [
   {"id": "ENG-1234", "title": "VCS Storage Permission Errors", "created": "2025-11-20"},
   {"id": "ENG-1156", "title": "VCS trace export failing", "created": "2025-10-15"},
-  {"id": "ENG-998", "title": "Permission denied in vcs-storage", "created": "2025-09-28"},
+  {"id": "ENG-998", "title": "Permission denied in service-b", "created": "2025-09-28"},
   {"id": "INS-1628", "title": "Track startup failures", "created": "2025-11-19"},
   {"id": "INS-1502", "title": "VCS integration errors", "created": "2025-10-01"},
   (3 more similar issues)
@@ -138,7 +138,7 @@ Identified 3 major patterns: (1) VCS permission errors recurring across 8 issues
 
 **Common Elements**:
 - **Error keywords**: "permission denied", "cloudtrace", "monitoring", "PermissionDenied"
-- **Affected service**: vcs-storage, vcs-service
+- **Affected service**: service-b, service-a
 - **Environment**: Production
 - **Labels**: production (6/8), bug (8/8), vcs (7/8)
 

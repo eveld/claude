@@ -30,20 +30,20 @@ You have specialized GCP debugging skills. Use these instead of raw gcloud comma
 → Use `gcp-locator` agent only
 - Fetches logs from multiple services/time ranges
 - Saves to /tmp for later analysis
-- Example: "Get all ERROR logs from vcs-storage, vcs-service, backend for last hour"
+- Example: "Get all ERROR logs from service-b, service-a, backend for last hour"
 
 **Investigating single service issue?**
 → Use `gcp-locator` + `gcp-analyzer` agents
 - Locator: Fetch relevant logs
 - Analyzer: Filter, diagnose root cause, check IAM/roles
-- Example: "Debug vcs-storage permission errors"
+- Example: "Debug service-b permission errors"
 
 **Need to correlate across services or find patterns?**
 → Use all three: `gcp-locator` + `gcp-analyzer` + `gcp-pattern-finder`
 - Locator: Fetch from all relevant services
 - Analyzer: Filter each service's logs
 - Pattern-finder: Correlate by trace_id, build timelines, find patterns
-- Example: "Trace request flow across vcs-service → vcs-storage → backend"
+- Example: "Trace request flow across service-a → service-b → backend"
 
 **Need to understand GCP IAP authentication?**
 → Check documentation or use WebFetch

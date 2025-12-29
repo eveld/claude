@@ -142,7 +142,7 @@ cat /tmp/all-issues.json | jq '[.[] | select(
 linearis issues list --limit 200 > /tmp/all-issues.json
 cat /tmp/all-issues.json | jq '[.[] | select(
   has("description") and
-  (.description | contains("instruqt.slack.com") or contains("unthread.io"))
+  (.description | contains("example.slack.com") or contains("unthread.io"))
 )]' > /tmp/support-tickets.json
 
 # Support team issues

@@ -90,7 +90,7 @@ wait
 ### Pods by Labels
 ```bash
 # By app label
-kubectl get pods -l app=vcs-storage -n vcs -o json > /tmp/pods-vcs-storage.json
+kubectl get pods -l app=service-b -n vcs -o json > /tmp/pods-service-b.json
 
 # Multiple labels
 kubectl get pods -l app=backend,tier=api -n core -o json > /tmp/pods-backend-api.json
@@ -108,7 +108,7 @@ kubectl get deployments -n vcs -o json > /tmp/deployments-vcs.json
 kubectl get services -n vcs -o json > /tmp/services-vcs.json
 
 # All resource types for service
-kubectl get pods,deployments,services,configmaps -n vcs -l app=vcs-storage -o json > /tmp/vcs-storage-resources.json
+kubectl get pods,deployments,services,configmaps -n vcs -l app=service-b -o json > /tmp/service-b-resources.json
 ```
 
 ### Events
@@ -142,8 +142,8 @@ Structure your response like this:
 ### Query Summary
 - **Namespaces**: vcs, integrations, core
 - **Resource types**: pods, deployments, services, events
-- **Context**: gke_instruqt-dev_europe-west1-b_core-private
-- **Filters**: app=vcs-storage, severity>=Warning
+- **Context**: gke_example-dev_europe-west1-b_core-private
+- **Filters**: app=service-b, severity>=Warning
 
 ### Results Fetched
 
@@ -151,7 +151,7 @@ Structure your response like this:
 - **File**: `/tmp/pods-vcs-20251224-151530.json`
 - **Count**: 8 pods
 - **Query**: `kubectl get pods -n vcs -o json`
-- **Apps found**: vcs-storage (3 replicas), vcs-service (3 replicas), vcs-temporal-worker (2 replicas)
+- **Apps found**: service-b (3 replicas), service-a (3 replicas), vcs-temporal-worker (2 replicas)
 
 #### vcs Namespace Deployments
 - **File**: `/tmp/deployments-vcs-20251224-151531.json`
@@ -180,7 +180,7 @@ Structure your response like this:
 ### Find All Resources for Service
 ```bash
 # Get everything related to a service
-SERVICE="vcs-storage"
+SERVICE="service-b"
 NAMESPACE="vcs"
 
 kubectl get pods -n $NAMESPACE -l app=$SERVICE -o json > /tmp/pods-$SERVICE.json

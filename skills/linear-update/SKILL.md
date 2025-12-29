@@ -116,7 +116,7 @@ Production issue: API gateway pods crashing due to database connection pool exha
 
 Impact: 30% of requests failing
 Started: 2025-12-24 10:28 UTC
-Environment: production (instruqt-production project)
+Environment: production (example-production project)
 EOF
 )"
 ```
@@ -140,7 +140,7 @@ linearis issues update ENG-1234 --state "Done"
 # 1. Read issue for context
 linearis issues read ENG-1234 > /tmp/issue-ENG-1234.json
 
-# 2. Debug (using GCP/K8s/Instruqt skills)
+# 2. Debug (using platform debugging skills)
 # ... debugging steps ...
 
 # 3. Add findings to issue

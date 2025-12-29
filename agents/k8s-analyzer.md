@@ -96,10 +96,10 @@ Extract and analyze:
 Structure your analysis like this:
 
 ```
-## Analysis: vcs-storage Pod Failures
+## Analysis: service-b Pod Failures
 
 ### Summary
-vcs-storage pods experiencing CrashLoopBackOff due to missing environment variable. 3 pods affected, all restarting every 30-60 seconds.
+service-b pods experiencing CrashLoopBackOff due to missing environment variable. 3 pods affected, all restarting every 30-60 seconds.
 
 ### Findings
 
@@ -108,15 +108,15 @@ vcs-storage pods experiencing CrashLoopBackOff due to missing environment variab
 - **Phase**: CrashLoopBackOff
 - **Restart count**: 23, 25, 21 (continuously restarting)
 - **Ready**: 0/3 (none ready)
-- **Evidence**: `/tmp/pods-vcs-storage-filtered.json`
+- **Evidence**: `/tmp/pods-service-b-filtered.json`
 
 **Pod details**:
 ```json
 {
-  "name": "vcs-storage-5ddcfbd7f8-bt5j9",
+  "name": "service-b-5ddcfbd7f8-bt5j9",
   "phase": "Running",
   "containerStatuses": [{
-    "name": "vcs-storage",
+    "name": "service-b",
     "state": {
       "waiting": {
         "reason": "CrashLoopBackOff",
@@ -139,25 +139,25 @@ vcs-storage pods experiencing CrashLoopBackOff due to missing environment variab
 #### Events Analysis
 **Recent events** (last 15 minutes):
 ```
-15:10:25  Warning  BackOff       Pod vcs-storage-5ddcfbd7f8-bt5j9
-          Back-off restarting failed container vcs-storage
+15:10:25  Warning  BackOff       Pod service-b-5ddcfbd7f8-bt5j9
+          Back-off restarting failed container service-b
 
-15:09:55  Warning  Failed        Pod vcs-storage-5ddcfbd7f8-bt5j9
-          Error: container "vcs-storage" exited with code 1
+15:09:55  Warning  Failed        Pod service-b-5ddcfbd7f8-bt5j9
+          Error: container "service-b" exited with code 1
 
-15:08:23  Normal   Pulled        Pod vcs-storage-5ddcfbd7f8-bt5j9
-          Container image "gcr.io/instruqt-dev/vcs-storage:abc123" already present
+15:08:23  Normal   Pulled        Pod service-b-5ddcfbd7f8-bt5j9
+          Container image "gcr.io/example-dev/service-b:abc123" already present
 
-15:08:23  Normal   Created       Pod vcs-storage-5ddcfbd7f8-bt5j9
-          Created container vcs-storage
+15:08:23  Normal   Created       Pod service-b-5ddcfbd7f8-bt5j9
+          Created container service-b
 
-15:08:22  Normal   Started       Pod vcs-storage-5ddcfbd7f8-bt5j9
-          Started container vcs-storage
+15:08:22  Normal   Started       Pod service-b-5ddcfbd7f8-bt5j9
+          Started container service-b
 ```
 
 **Pattern**: Container starts, exits immediately (2-3 seconds), backs off, repeats.
 
-**Evidence**: `/tmp/events-vcs-storage-5ddcfbd7f8-bt5j9.json`
+**Evidence**: `/tmp/events-service-b-5ddcfbd7f8-bt5j9.json`
 
 #### Container Logs Analysis
 
@@ -173,7 +173,7 @@ vcs-storage pods experiencing CrashLoopBackOff due to missing environment variab
 2025-12-24T15:09:53.124Z [ERROR] Application startup failed
 ```
 
-**Evidence**: `/tmp/logs-vcs-storage-5ddcfbd7f8-bt5j9.txt`
+**Evidence**: `/tmp/logs-service-b-5ddcfbd7f8-bt5j9.txt`
 
 #### Root Cause Analysis
 
@@ -182,20 +182,20 @@ vcs-storage pods experiencing CrashLoopBackOff due to missing environment variab
 **Investigation**:
 1. **Environment Variables**: ❌ DATABASE_URL not defined
    ```bash
-   kubectl get deployment vcs-storage -n vcs -o json | \
+   kubectl get deployment service-b -n vcs -o json | \
      jq '.spec.template.spec.containers[0].env'
    # Returns: [] (empty array)
    ```
 
 2. **ConfigMap/Secret**: ⚠️  Check if referenced correctly
    ```bash
-   kubectl get deployment vcs-storage -n vcs -o json | \
+   kubectl get deployment service-b -n vcs -o json | \
      jq '.spec.template.spec.containers[0].envFrom'
    # Check for configMapRef or secretRef
    ```
 
 3. **Deployment Manifest**: Read actual configuration
-   - File: `~/code/instruqt/manifests/services/core/vcs/base/deployment.yaml`
+   - File: `~/code/example-project/manifests/services/core/vcs/base/deployment.yaml`
    - Check env section for DATABASE_URL definition
 
 **Root Cause**: Deployment missing environment variable configuration. Either:
@@ -212,7 +212,7 @@ spec:
   template:
     spec:
       containers:
-      - name: vcs-storage
+      - name: service-b
         env:
         - name: DATABASE_URL
           value: "postgresql://..." # or use secret reference
@@ -224,19 +224,19 @@ spec:
   template:
     spec:
       containers:
-      - name: vcs-storage
+      - name: service-b
         env:
         - name: DATABASE_URL
           valueFrom:
             secretKeyRef:
-              name: vcs-storage-secrets
+              name: service-b-secrets
               key: database-url
 ```
 
 **After fix**:
 1. Update manifest
 2. Apply: `kubectl apply -f deployment.yaml`
-3. Verify: `kubectl rollout status deployment/vcs-storage -n vcs`
+3. Verify: `kubectl rollout status deployment/service-b -n vcs`
 
 ### Additional Issues Found
 
@@ -260,10 +260,10 @@ resources:
 ```
 
 ### Evidence Files
-- `/tmp/pods-vcs-storage-filtered.json` - Pod health status
-- `/tmp/events-vcs-storage-5ddcfbd7f8-bt5j9.json` - Pod events
-- `/tmp/logs-vcs-storage-5ddcfbd7f8-bt5j9.txt` - Container logs
-- `/tmp/describe-vcs-storage-5ddcfbd7f8-bt5j9.txt` - Full pod description
+- `/tmp/pods-service-b-filtered.json` - Pod health status
+- `/tmp/events-service-b-5ddcfbd7f8-bt5j9.json` - Pod events
+- `/tmp/logs-service-b-5ddcfbd7f8-bt5j9.txt` - Container logs
+- `/tmp/describe-service-b-5ddcfbd7f8-bt5j9.txt` - Full pod description
 ```
 
 ## Analysis Techniques

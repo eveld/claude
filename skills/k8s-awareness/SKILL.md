@@ -35,13 +35,13 @@ You have specialized Kubernetes debugging skills. Use these instead of raw kubec
 → Use `k8s-locator` agent only
 - Lists pods, deployments, services across namespaces
 - Saves to /tmp for later analysis
-- Example: "Get all pods in vcs, integrations, core namespaces"
+- Example: "Get all pods in production, staging, development namespaces"
 
 **Investigating single pod/service issue?**
 → Use `k8s-locator` + `k8s-analyzer` agents
 - Locator: Find relevant pods/resources
 - Analyzer: Diagnose health, check events, analyze logs
-- Example: "Debug vcs-storage CrashLoopBackOff"
+- Example: "Debug service-b CrashLoopBackOff"
 
 **Need to find patterns or cluster-wide issues?**
 → Use all three: `k8s-locator` + `k8s-analyzer` + `k8s-pattern-finder`

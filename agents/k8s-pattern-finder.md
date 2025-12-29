@@ -142,28 +142,28 @@ Detected systematic ImagePullBackOff affecting 12 pods across 3 namespaces due t
 [
   {
     "namespace": "vcs",
-    "pods": ["vcs-storage-abc123", "vcs-service-def456"],
-    "image": "gcr.io/instruqt-dev/vcs-storage:v2.1.0"
+    "pods": ["service-b-abc123", "service-a-def456"],
+    "image": "gcr.io/example-dev/service-b:v2.1.0"
   },
   {
     "namespace": "integrations",
-    "pods": ["integrations-salesforce-ghi789", "integrations-slack-jkl012"],
-    "image": "gcr.io/instruqt-dev/integrations:v1.5.0"
+    "pods": ["integrations-service-c-ghi789", "integrations-slack-jkl012"],
+    "image": "gcr.io/example-dev/integrations:v1.5.0"
   },
   {
     "namespace": "core",
     "pods": ["backend-mno345", "frontend-pqr678", ...],
-    "image": "gcr.io/instruqt-dev/*"
+    "image": "gcr.io/example-dev/*"
   }
 ]
 ```
 
 **Timeline**:
 ```
-14:45:23  [vcs]          Pod vcs-storage-abc123 → ImagePullBackOff
-                         Error: pull access denied for gcr.io/instruqt-dev/vcs-storage
+14:45:23  [vcs]          Pod service-b-abc123 → ImagePullBackOff
+                         Error: pull access denied for gcr.io/example-dev/service-b
 
-14:45:45  [integrations] Pod integrations-salesforce-ghi789 → ImagePullBackOff
+14:45:45  [integrations] Pod integrations-service-c-ghi789 → ImagePullBackOff
                          Error: pull access denied
 
 14:46:12  [core]         Pod backend-mno345 → ImagePullBackOff
@@ -175,7 +175,7 @@ Detected systematic ImagePullBackOff affecting 12 pods across 3 namespaces due t
 **Pattern Evidence**:
 All affected pods share:
 - Same error message: "pull access denied"
-- Same registry: gcr.io/instruqt-dev
+- Same registry: gcr.io/example-dev
 - Started within 45-minute window
 - Affecting NEW pods (deployments), not existing running pods
 
@@ -202,8 +202,8 @@ kubectl get secret gcr-json-key -n vcs -o jsonpath='{.data}'
 **Timeline**:
 ```
 15:10:00  Node gke-core-private-pool-abc123 → DiskPressure condition
-15:11:23  Pod vcs-storage-xyz → Evicted (DiskPressure)
-15:11:45  Pod integrations-salesforce-abc → Evicted (DiskPressure)
+15:11:23  Pod service-b-xyz → Evicted (DiskPressure)
+15:11:45  Pod integrations-service-c-abc → Evicted (DiskPressure)
 15:12:10  Pod backend-def → Evicted (DiskPressure)
 ... (5 more pods evicted)
 ```
@@ -220,8 +220,8 @@ Conditions:
 ```
 
 **Affected Services**:
-- vcs-storage: 2 pods evicted
-- integrations-salesforce: 1 pod evicted
+- service-b: 2 pods evicted
+- integrations-service-c: 1 pod evicted
 - backend: 3 pods evicted
 - frontend: 2 pods evicted
 
@@ -236,13 +236,13 @@ Conditions:
 
 ### Pattern 3: Deployment Rollout Cascade
 
-**Discovery**: Deployment of vcs-service triggered cascading restarts in dependent services
+**Discovery**: Deployment of service-a triggered cascading restarts in dependent services
 
 **Timeline**:
 ```
-14:30:00  Deployment vcs-service updated (new image version)
-14:30:15  vcs-service pods rolling restart (expected)
-14:31:30  integrations-salesforce pods restart (unexpected)
+14:30:00  Deployment service-a updated (new image version)
+14:30:15  service-a pods rolling restart (expected)
+14:31:30  integrations-service-c pods restart (unexpected)
 14:32:15  backend pods showing connection errors to vcs
 14:33:00  backend deployment triggers rolling restart (recovery)
 ```
@@ -250,11 +250,11 @@ Conditions:
 **Pattern**: Upstream service deployment causes downstream service disruptions due to connection handling
 
 **Services Impacted**:
-1. vcs-service (intended) → deployed new version
-2. integrations-salesforce (cascade) → lost connections, restarted
+1. service-a (intended) → deployed new version
+2. integrations-service-c (cascade) → lost connections, restarted
 3. backend (cascade) → connection pool exhausted, restarted
 
-**Root Cause**: Services don't handle connection loss gracefully during vcs-service restart. Connection pools not recovering automatically.
+**Root Cause**: Services don't handle connection loss gracefully during service-a restart. Connection pools not recovering automatically.
 
 **Recommendation**: Implement:
 - Graceful connection handling with retry logic
@@ -269,18 +269,18 @@ Conditions:
 ```
 Node Issues:
   gke-core-private-pool-abc123 (DiskPressure)
-    ├─ vcs-storage: 2 pods evicted
+    ├─ service-b: 2 pods evicted
     ├─ integrations: 1 pod evicted
     └─ backend: 5 pods evicted
 
 Registry Issues:
-  gcr.io/instruqt-dev (AuthFailure)
+  gcr.io/example-dev (AuthFailure)
     ├─ All namespaces: 12 pods ImagePullBackOff
     └─ Only NEW pods affected
 
 Deployment Impact:
-  vcs-service rollout
-    ├─ integrations-salesforce: connection loss
+  service-a rollout
+    ├─ integrations-service-c: connection loss
     └─ backend: connection pool exhaustion
 ```
 

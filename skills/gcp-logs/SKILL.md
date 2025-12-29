@@ -32,7 +32,7 @@ echo "Current GCP Project: $CURRENT_PROJECT"
 # Example: User mentions "production" but current project is "staging"
 # Detect from query context and prompt:
 # echo "Query mentions 'production' but current project is '$CURRENT_PROJECT'"
-# echo "Switch to production project? Run: gcloud config set project instruqt-production"
+# echo "Switch to production project? Run: gcloud config set project example-production"
 # read -p "Continue with current project? (y/n) " -n 1 -r
 ```
 
@@ -61,23 +61,23 @@ Kubernetes container logs have a `resource.type="k8s_container"` with these labe
 ```bash
 # Filter by container name (most useful for finding service logs)
 gcloud logging read \
-  'resource.type="k8s_container" AND resource.labels.container_name="vcs-storage"' \
+  'resource.type="k8s_container" AND resource.labels.container_name="service-b"' \
   --limit=100 \
   --format=json
 
 # Filter by namespace and container
 gcloud logging read \
-  'resource.labels.namespace_name="vcs" AND resource.labels.container_name="vcs-storage"' \
+  'resource.labels.namespace_name="app-namespace" AND resource.labels.container_name="service-b"' \
   --limit=100
 
 # Filter by pod name (specific pod instance)
 gcloud logging read \
-  'resource.labels.pod_name="vcs-storage-5ddcfbd7f8-bt5j9"' \
+  'resource.labels.pod_name="service-b-5ddcfbd7f8-bt5j9"' \
   --limit=100
 
 # Filter by cluster name
 gcloud logging read \
-  'resource.labels.cluster_name="core" AND resource.labels.container_name="salesforce"' \
+  'resource.labels.cluster_name="production-cluster" AND resource.labels.container_name="service-c"' \
   --limit=100
 
 # Available K8s resource labels (from resource.labels):
@@ -96,10 +96,10 @@ gcloud logging read \
     "type": "k8s_container",
     "labels": {
       "cluster_name": "core-private",
-      "container_name": "salesforce",
+      "container_name": "service-c",
       "namespace_name": "integrations",
-      "pod_name": "integrations-salesforce-85f98fc5c-7mbdq",
-      "project_id": "instruqt-dev",
+      "pod_name": "integrations-service-c-85f98fc5c-7mbdq",
+      "project_id": "example-dev",
       "location": "europe-west1"
     }
   },
@@ -132,7 +132,7 @@ gcloud logging read \
   'resource.labels.container_name="api-gateway" AND severity>=ERROR AND timestamp>="2025-12-24T10:00:00Z"' \
   --limit=100 \
   --format=json \
-  --project=instruqt-production
+  --project=example-production
 ```
 
 ## Output Format
@@ -180,125 +180,6 @@ cat /tmp/gcp-errors-*.json | jq '.[] | select(.severity=="CRITICAL")'
 
 ## Advanced Query Patterns
 
-### 5. Querying GraphQL Operations
-
-GraphQL requests are logged with structured payloads containing operation details:
-
-```bash
-# Find specific GraphQL operation by name
-gcloud logging read \
-  'jsonPayload.operation_name="GetInstruqtUser"' \
-  --limit=50 \
-  --format=json \
-  --project=instruqt-dev
-
-# Filter by message type (requests vs responses)
-gcloud logging read \
-  'jsonPayload.message="Received graphql api request" AND jsonPayload.operation_name="updateTrack"' \
-  --limit=50 \
-  --format=json
-
-# Or filter for executed operations (responses)
-gcloud logging read \
-  'jsonPayload.message="Executed graphql api request" AND jsonPayload.operation_name="GetInstruqtUser"' \
-  --limit=50 \
-  --format=json
-
-# Find all mutations (operations containing specific keywords)
-gcloud logging read \
-  'jsonPayload.operation_name=~"update" OR jsonPayload.operation_name=~"create" OR jsonPayload.operation_name=~"delete"' \
-  --limit=100 \
-  --format=json
-
-# Filter by user
-gcloud logging read \
-  'jsonPayload.operation_name="GetInstruqtUser" AND jsonPayload.user_id="mtc3f7SxQBRY2V7KWY0dVWVrvOh2"' \
-  --limit=50 \
-  --format=json
-```
-
-**GraphQL log entry structure**:
-```json
-{
-  "jsonPayload": {
-    "message": "Executed graphql api request",
-    "operation_name": "GetInstruqtUser",
-    "user_id": "mtc3f7SxQBRY2V7KWY0dVWVrvOh2",
-    "trace_id": "fa7de37f7aee80ae17d6fc76edd39bb9",
-    "remote_addr": "145.53.225.93,34.49.158.107",
-    "variables": {},
-    "query": "query GetInstruqtUser { ... }",
-    "latency": 196
-  },
-  "resource": {
-    "type": "k8s_container",
-    "labels": { "container_name": "backend", "namespace_name": "core" }
-  },
-  "severity": "DEBUG"
-}
-```
-
-**Available fields for filtering**:
-- `jsonPayload.operation_name` - GraphQL operation name
-- `jsonPayload.user_id` - User making the request
-- `jsonPayload.trace_id` - Distributed trace ID
-- `jsonPayload.variables` - GraphQL variables (complex filtering → use jq)
-- `jsonPayload.query` - Full GraphQL query text
-- `jsonPayload.latency` - Request latency in milliseconds
-- `jsonPayload.message` - "Received graphql api request" or "Executed graphql api request"
-
-### 6. Two-Stage Query Strategy (Recommended for Complex Filters)
-
-When you need complex filtering, use a **two-stage approach**: broad gcloud query → jq post-processing
-
-```bash
-# Stage 1: Broad gcloud query (simpler, faster, less likely to fail)
-gcloud logging read \
-  'jsonPayload.message="Received graphql api request" AND timestamp>="2025-11-20T15:00:00Z" AND timestamp<="2025-11-20T16:00:00Z"' \
-  --limit=500 \
-  --format=json \
-  --project=instruqt-prod > /tmp/graphql-ops.json
-
-# Stage 2: Complex filtering with jq
-cat /tmp/graphql-ops.json | jq -r '.[] | select(
-  (.jsonPayload.variables.teamSlug == "kong") or
-  (.jsonPayload.variables.slug == "track-name") or
-  (.jsonPayload.query // "" | contains("keyword"))
-)'
-
-# Count matching results
-cat /tmp/graphql-ops.json | jq -r '[.[] | select(.jsonPayload.operation_name | contains("update"))] | length'
-
-# Group by operation name
-cat /tmp/graphql-ops.json | jq -r 'group_by(.jsonPayload.operation_name) | map({operation: .[0].jsonPayload.operation_name, count: length})'
-```
-
-**Why this approach?**
-- More reliable than complex gcloud filters
-- Easier to debug (inspect intermediate results)
-- Avoids escaping issues with complex filters
-- Better performance for complex conditions
-
-### 7. Checking Data Availability
-
-Before running expensive queries, verify logs exist in your time range:
-
-```bash
-# Quick check: do ANY logs exist in this time range?
-gcloud logging read \
-  'timestamp>="2025-11-20T00:00:00Z" AND timestamp<="2025-11-20T23:59:59Z"' \
-  --limit=1 \
-  --format=json \
-  --project=instruqt-prod | jq 'length'
-
-# Returns: 1 (logs exist) or 0 (no logs in range)
-
-# Check specific log source exists
-gcloud logging read \
-  'jsonPayload.message="Received graphql api request" AND timestamp>="2025-11-20T15:00:00Z" AND timestamp<="2025-11-20T15:30:00Z"' \
-  --limit=5 \
-  --format=json \
-  --project=instruqt-prod | jq 'length'
 ```
 
 ## Common Pitfalls and Solutions

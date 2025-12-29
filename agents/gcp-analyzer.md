@@ -39,8 +39,8 @@ You are a specialist at diagnosing issues in GCP services. Your job is to analyz
 If gcp-locator was used:
 ```bash
 # Read saved log files
-cat /tmp/vcs-storage-logs-*.json | jq 'length'
-cat /tmp/vcs-storage-logs-*.json | jq '[.[].severity] | group_by(.) | map({severity: .[0], count: length})'
+cat /tmp/service-b-logs-*.json | jq 'length'
+cat /tmp/service-b-logs-*.json | jq '[.[].severity] | group_by(.) | map({severity: .[0], count: length})'
 ```
 
 Or fetch fresh data:
@@ -85,7 +85,7 @@ gcloud projects get-iam-policy PROJECT \
 For configuration issues:
 ```bash
 # Read Terraform configuration
-cat ~/code/instruqt/infrastructure/plans/SERVICE/iam.tf
+cat ~/code/example-project/infrastructure/plans/SERVICE/iam.tf
 
 # Check K8s service account annotations
 kubectl get sa SA_NAME -n NAMESPACE -o json | jq '.metadata.annotations'
@@ -107,7 +107,7 @@ Structure your analysis like this:
 - **Count**: 487 PermissionDenied errors
 - **Time range**: 2025-12-24 10:00-11:00 UTC (continuous)
 - **Affected operation**: cloudtrace.traces.patch
-- **Evidence**: `/tmp/vcs-storage-errors-filtered.json`
+- **Evidence**: `/tmp/service-b-errors-filtered.json`
 
 Example log entry:
 ```json
@@ -119,9 +119,9 @@ Example log entry:
   },
   "resource": {
     "labels": {
-      "container_name": "vcs-storage",
+      "container_name": "service-b",
       "namespace_name": "vcs",
-      "pod_name": "vcs-storage-5ddcfbd7f8-bt5j9"
+      "pod_name": "service-b-5ddcfbd7f8-bt5j9"
     }
   }
 }
@@ -129,7 +129,7 @@ Example log entry:
 
 #### Root Cause Analysis
 
-**Issue**: vcs-storage pod cannot export traces to Cloud Trace
+**Issue**: service-b pod cannot export traces to Cloud Trace
 
 **Investigation**:
 1. **GCP IAM Role**: ✅ Has permission
@@ -137,7 +137,7 @@ Example log entry:
    - Verified: `/tmp/role-vcs_role.json`
 
 2. **Service Account Binding**: ✅ Correctly bound
-   - SA `vcs-service@instruqt-dev.iam.gserviceaccount.com` has role
+   - SA `service-a@example-dev.iam.gserviceaccount.com` has role
    - Verified via `gcloud projects get-iam-policy`
 
 3. **Workload Identity Binding**: ⚠️ OLD FORMAT
@@ -146,7 +146,7 @@ Example log entry:
 
 4. **K8s Service Account**: ❌ MISSING ANNOTATION
    - K8s SA `vcs` in namespace `vcs` lacks required annotation
-   - Missing: `iam.gke.io/gcp-service-account: vcs-service@instruqt-dev.iam.gserviceaccount.com`
+   - Missing: `iam.gke.io/gcp-service-account: service-a@example-dev.iam.gserviceaccount.com`
    - Verified: `kubectl get sa vcs -n vcs -o json`
 
 **Root Cause**: Pod cannot authenticate as GCP service account because K8s SA is missing workload identity annotation. Old workload identity format requires this annotation.
@@ -161,7 +161,7 @@ kind: ServiceAccount
 metadata:
   name: vcs
   annotations:
-    iam.gke.io/gcp-service-account: vcs-service@instruqt-dev.iam.gserviceaccount.com
+    iam.gke.io/gcp-service-account: service-a@example-dev.iam.gserviceaccount.com
 ```
 
 **Option 2: Migrate to new workload identity format** (Recommended)
@@ -178,7 +178,7 @@ resource "google_project_iam_binding" "vcs_ksa" {
 This eliminates need for K8s annotation.
 
 ### Evidence Files
-- `/tmp/vcs-storage-errors-filtered.json` - 487 filtered errors
+- `/tmp/service-b-errors-filtered.json` - 487 filtered errors
 - `/tmp/role-vcs_role.json` - GCP role permissions
 - `/tmp/sa-bindings.json` - Service account bindings
 - `/tmp/error-summary.json` - Error type grouping

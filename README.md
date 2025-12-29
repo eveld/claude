@@ -5,9 +5,9 @@ Custom research, planning, and implementation workflows for Claude Code with int
 ## Features
 
 ### Core Commands
-- `/research` - Comprehensive codebase research with parallel agent orchestration
-- `/plan` - Interactive implementation planning with project-specific discovery
-- `/implement` - Systematic plan execution with automatic verification
+- `/workflows:research` - Comprehensive codebase research with parallel agent orchestration
+- `/workflows:plan` - Interactive implementation planning with project-specific discovery
+- `/workflows:implement` - Systematic plan execution with automatic verification
 
 ### Intelligent Agent Awareness
 Claude automatically uses specialized agents instead of basic tools:
@@ -67,7 +67,7 @@ cd claude
 When available:
 ```bash
 /plugin marketplace add eveld/claude
-/plugin install eveld-workflows@eveld-claude
+/plugin install workflows@eveld-claude
 ```
 
 ## Usage
@@ -77,7 +77,7 @@ When available:
 Conduct comprehensive codebase research:
 
 ```bash
-/research how does authentication work in the codebase?
+/workflows:research how does authentication work in the codebase?
 ```
 
 **What happens**:
@@ -97,7 +97,7 @@ Conduct comprehensive codebase research:
 Create detailed implementation plans:
 
 ```bash
-/plan thoughts/tickets/add-email-notifications.md
+/workflows:plan thoughts/tickets/add-email-notifications.md
 ```
 
 **What happens**:
@@ -121,7 +121,7 @@ Create detailed implementation plans:
 Execute approved implementation plans:
 
 ```bash
-/implement thoughts/shared/plans/YYYY-MM-DD-01-feature-name.md
+/workflows:implement thoughts/shared/plans/YYYY-MM-DD-01-feature-name.md
 ```
 
 **What happens**:
@@ -130,6 +130,24 @@ Execute approved implementation plans:
 3. Follows test patterns from `thoughts/notes/testing.md`
 4. Verifies using commands from `thoughts/notes/commands.md`
 5. Updates checkboxes in plan as it progresses
+
+## Project Directory Structure
+
+When using the workflows plugin, the following directory structure is created in your project:
+
+```
+your-project/
+├── thoughts/
+│   ├── shared/
+│   │   ├── research/        # Research documents from /workflows:research
+│   │   └── plans/           # Implementation plans from /workflows:plan
+│   └── notes/
+│       ├── commands.md      # Auto-discovered project commands
+│       └── testing.md       # Auto-discovered test patterns
+└── [your project files...]
+```
+
+**Note**: The `thoughts/` directory is created automatically when you use the plugin commands. It stores research, plans, and project metadata in your working directory.
 
 ### Autonomous Skill Usage
 
@@ -150,7 +168,7 @@ User: "Show me GCP errors for api-gateway"
 Claude: [Uses gcp-awareness → gcp-logs skill]
 
 User: "Check if production pods are running"
-Claude: [Uses k8s-awareness → kubernetes skill]
+Claude: [Uses k8s-awareness → k8s-query skill]
 
 User: "Debug the crashing pod api-gateway-xyz"
 Claude: [Uses k8s-awareness → k8s-debug skill]
@@ -158,7 +176,7 @@ Claude: [Uses k8s-awareness → k8s-debug skill]
 User: "Add my findings to ENG-1234"
 Claude: [Uses linear-awareness → linear-update skill]
 
-User: "Investigate production errors across vcs-service and backend"
+User: "Investigate production errors across service-a and backend"
 Claude: [Uses debugging-awareness → spawns gcp-locator + gcp-analyzer + gcp-pattern-finder agents]
 
 User: "Find why multiple pods are ImagePullBackOff"
@@ -197,20 +215,20 @@ github.com/eveld/claude/
 │   ├── thoughts-analyzer.md
 │   ├── web-search-researcher.md
 │   ├── error-analyzer.md
-│   ├── gcp-locator.md          # NEW: Platform debugging
-│   ├── gcp-analyzer.md         # NEW: Platform debugging
-│   ├── gcp-pattern-finder.md   # NEW: Platform debugging
-│   ├── k8s-locator.md          # NEW: Platform debugging
-│   ├── k8s-analyzer.md         # NEW: Platform debugging
-│   ├── k8s-pattern-finder.md   # NEW: Platform debugging
-│   ├── linear-locator.md       # NEW: Platform debugging
-│   ├── linear-analyzer.md      # NEW: Platform debugging
-│   └── linear-pattern-finder.md # NEW: Platform debugging
+│   ├── gcp-locator.md
+│   ├── gcp-analyzer.md
+│   ├── gcp-pattern-finder.md
+│   ├── k8s-locator.md
+│   ├── k8s-analyzer.md
+│   ├── k8s-pattern-finder.md
+│   ├── linear-locator.md
+│   ├── linear-analyzer.md
+│   └── linear-pattern-finder.md
 ├── commands/                # Workflow orchestration (3)
 │   ├── research.md
 │   ├── plan.md
 │   └── implement.md
-├── skills/                  # Reusable capabilities (30)
+├── skills/                  # Reusable capabilities (24)
 │   ├── agent-awareness/
 │   ├── before-file-search/
 │   ├── before-code-analysis/
@@ -227,20 +245,15 @@ github.com/eveld/claude/
 │   ├── write-commit-message/
 │   ├── write-pr-description/
 │   ├── debug-systematically/
-│   ├── gcp-awareness/           # Platform debugging
-│   ├── k8s-awareness/           # Platform debugging
-│   ├── instruqt-awareness/      # Platform debugging
-│   ├── instruqt-cli-awareness/  # Platform debugging
-│   ├── instruqt-platform-awareness/  # Platform debugging
-│   ├── linear-awareness/        # Platform debugging
-│   ├── debugging-awareness/     # Platform debugging
-│   ├── gcp-logs/          # Platform debugging
-│   ├── kubernetes/        # Platform debugging
-│   ├── instruqt-tracks/   # Platform debugging
-│   ├── instruqt-labs/     # Platform debugging
-│   ├── linear-issues/     # Platform debugging
-│   ├── linear-update/     # Platform debugging
-│   └── k8s-debug/  # Platform debugging
+│   ├── debugging-awareness/
+│   ├── gcp-awareness/
+│   ├── gcp-logs/
+│   ├── k8s-awareness/
+│   ├── k8s-debug/
+│   ├── k8s-query/
+│   ├── linear-awareness/
+│   ├── linear-issues/
+│   └── linear-update/
 ├── templates/               # Document templates (4)
 │   ├── research-document.md
 │   ├── plan-document.md
@@ -253,7 +266,7 @@ github.com/eveld/claude/
 ### How It Works
 
 **Slash Commands** → Workflow orchestration
-- User invokes with `/research`, `/plan`, `/implement`
+- User invokes with `/workflows:research`, `/workflows:plan`, `/workflows:implement`
 - Commands compose skills to achieve goals
 - Thin orchestration layer
 
@@ -276,7 +289,6 @@ github.com/eveld/claude/
 - `before-spawning-task` - Ensure correct agent
 - `gcp-awareness` - Guide for GCP debugging skills
 - `k8s-awareness` - Guide for Kubernetes debugging skills
-- `instruqt-awareness` - Guide for Instruqt platform skills
 - `linear-awareness` - Guide for Linear ticket management skills
 - `debugging-awareness` - Master platform debugging workflow
 
@@ -292,12 +304,10 @@ github.com/eveld/claude/
 - `write-pr-description` - Structured PRs
 - `debug-systematically` - Systematic debugging
 - `gcp-logs` - GCP Cloud Logging queries
-- `kubernetes` - Kubernetes resource queries
-- `instruqt-tracks` - Instruqt track operations
-- `instruqt-labs` - Instruqt lab operations
+- `k8s-query` - Kubernetes resource queries
+- `k8s-debug` - K8s debug containers
 - `linear-issues` - Linear issue/ticket queries
 - `linear-update` - Linear issue updates
-- `k8s-debug` - K8s debug containers
 
 **Tier 3 - Supporting** (Utilities):
 - `gather-project-metadata` - Collect git info

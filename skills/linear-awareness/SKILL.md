@@ -106,7 +106,7 @@ Linear skills integrate with platform debugging:
 
 **Workflow**:
 1. `linear-issues` → Fetch ticket context
-2. `debugging-awareness` → Systematic investigation (GCP + K8s + Instruqt)
+2. Platform investigation → Use GCP and K8s skills for debugging
 3. `linear-update` → Add findings to ticket
 4. `linear-update` → Update status to "Done"
 
@@ -114,6 +114,6 @@ Linear skills integrate with platform debugging:
 ```
 User: "Debug issue ENG-1234"
 Claude: [Checks linear-awareness] → Uses linear-issues
-        [Checks debugging-awareness] → Uses GCP/K8s/Instruqt skills
+        [Investigates using GCP/K8s skills]
         [Checks linear-awareness] → Uses linear-update
 ```

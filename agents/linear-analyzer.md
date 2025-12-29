@@ -124,27 +124,27 @@ Permission monitoring.metricDescriptors.create denied
 Permission cloudtrace.traces.patch denied
 ```
 
-**Affected Service**: vcs-storage
-**Environment**: Production (instruqt-prod)
+**Affected Service**: service-b
+**Environment**: Production (example-prod)
 **Impact**: All users attempting updateTrack mutations
 **Frequency**: Continuous since 2025-11-20 14:30 UTC
 
 ### Technical Details Extracted
 
 **Services Involved**:
-- vcs-storage (primary issue)
-- vcs-service (upstream caller)
+- service-b (primary issue)
+- service-a (upstream caller)
 - backend GraphQL API (entry point)
 
 **Error Pattern**:
 1. User triggers updateTrack mutation
-2. Request flows through backend → vcs-service → vcs-storage
-3. vcs-storage attempts trace export → PermissionDenied
+2. Request flows through backend → service-a → service-b
+3. service-b attempts trace export → PermissionDenied
 4. Main operation succeeds but telemetry fails
 
 **GCP Resources**:
-- Project: instruqt-prod
-- Service Account: vcs-service@instruqt-prod.iam.gserviceaccount.com
+- Project: example-prod
+- Service Account: service-a@example-prod.iam.gserviceaccount.com
 - Missing Permissions:
   - cloudtrace.traces.patch
   - monitoring.metricDescriptors.create
@@ -152,17 +152,17 @@ Permission cloudtrace.traces.patch denied
 
 **Kubernetes**:
 - Namespace: vcs
-- Pod: vcs-storage-*
+- Pod: service-b-*
 - ServiceAccount: vcs
 
 ### Reproduction Steps
 
 From issue description:
-1. Log into Instruqt as any user
+1. Log into the platform as any user
 2. Navigate to team track settings
 3. Update any track configuration
 4. Observe: Update succeeds but logs show permission errors
-5. Check GCP logs: PermissionDenied errors in vcs-storage
+5. Check GCP logs: PermissionDenied errors in service-b
 
 ### Investigation Timeline
 
@@ -195,16 +195,16 @@ Found 5 other "vcs" labeled issues:
 ### Supporting Resources
 
 **Slack Thread** (from description):
-- URL: https://instruqt.slack.com/archives/C123/p1234567890
+- URL: https://example.slack.com/archives/C123/p1234567890
 - Summary: Discussion of permission errors starting 2025-11-20
 
 **Unthread Ticket**:
-- URL: https://instruqt.unthread.io/t/abc123
+- URL: https://example.unthread.io/t/abc123
 - Customer: Kong team
 - Original report of track update failures
 
 **GCP Logs Reference**:
-- Mentioned in description: "Check Cloud Logging for vcs-storage container"
+- Mentioned in description: "Check Cloud Logging for service-b container"
 - Time range: 2025-11-20 14:30 onwards
 - Expected errors: PermissionDenied for cloudtrace/monitoring
 
@@ -214,7 +214,7 @@ Found 5 other "vcs" labeled issues:
 VCS storage service missing Kubernetes ServiceAccount annotation for workload identity. Service uses old workload identity format which requires:
 ```yaml
 annotations:
-  iam.gke.io/gcp-service-account: vcs-service@instruqt-prod.iam.gserviceaccount.com
+  iam.gke.io/gcp-service-account: service-a@example-prod.iam.gserviceaccount.com
 ```
 
 **Why It Matters**:
@@ -230,7 +230,7 @@ Without annotation, pod cannot authenticate as GCP service account, causing all 
 **Immediate Actions**:
 1. Review findings from GCP logs investigation (run gcp-analyzer)
 2. Check if permissions applied manually in GCP (already done)
-3. Review Jimmy's branch fix: `jimmy/udpate-vcs-service-account-permissions`
+3. Review Jimmy's branch fix: `jimmy/udpate-service-a-account-permissions`
 4. Decide: Add annotation or migrate to new workload identity format
 
 **Long-term**:

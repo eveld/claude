@@ -38,8 +38,8 @@ You are a specialist at finding patterns and correlations in distributed systems
 
 ```bash
 # Read logs from different services (saved by gcp-locator or gcp-analyzer)
-VCS_STORAGE=$(cat /tmp/vcs-storage-logs.json)
-VCS_SERVICE=$(cat /tmp/vcs-service-logs.json)
+VCS_STORAGE=$(cat /tmp/service-b-logs.json)
+VCS_SERVICE=$(cat /tmp/service-a-logs.json)
 INTEGRATIONS=$(cat /tmp/integrations-logs.json)
 BACKEND=$(cat /tmp/backend-logs.json)
 ```
@@ -57,13 +57,13 @@ Determine what to correlate by:
 
 ```bash
 # Extract trace_ids from errors
-cat /tmp/vcs-storage-logs.json | jq '[.[] | select(.severity=="ERROR") | .jsonPayload.trace_id] | unique' > /tmp/error-trace-ids.json
+cat /tmp/service-b-logs.json | jq '[.[] | select(.severity=="ERROR") | .jsonPayload.trace_id] | unique' > /tmp/error-trace-ids.json
 
 # Find matching events in other services by trace_id
 TRACE_IDS=$(cat /tmp/error-trace-ids.json | jq -r '.[]')
 for trace_id in $TRACE_IDS; do
   echo "=== Trace: $trace_id ===" >> /tmp/correlated-events.txt
-  cat /tmp/vcs-service-logs.json | jq ".[] | select(.jsonPayload.trace_id==\"$trace_id\")" >> /tmp/correlated-events.txt
+  cat /tmp/service-a-logs.json | jq ".[] | select(.jsonPayload.trace_id==\"$trace_id\")" >> /tmp/correlated-events.txt
   cat /tmp/backend-logs.json | jq ".[] | select(.jsonPayload.trace_id==\"$trace_id\")" >> /tmp/correlated-events.txt
 done
 ```
@@ -72,7 +72,7 @@ done
 
 ```bash
 # Find events within time window (e.g., errors followed by related events within 5s)
-ERROR_TIMES=$(cat /tmp/vcs-storage-logs.json | jq -r '.[] | select(.severity=="ERROR") | .timestamp')
+ERROR_TIMES=$(cat /tmp/service-b-logs.json | jq -r '.[] | select(.severity=="ERROR") | .timestamp')
 
 # For each error, find events in other services within ±5 seconds
 # This requires timestamp parsing and comparison
@@ -111,15 +111,15 @@ Structure your findings like this:
 ## Pattern Analysis: Cross-Service Correlation
 
 ### Summary
-Identified cascade failure pattern: GraphQL mutations trigger vcs-storage permission errors, causing downstream integration failures. Pattern affects 15 trace_ids over 1 hour period.
+Identified cascade failure pattern: GraphQL mutations trigger service-b permission errors, causing downstream integration failures. Pattern affects 15 trace_ids over 1 hour period.
 
 ### Correlation Method
 - **Primary key**: trace_id from GraphQL requests
-- **Services analyzed**: backend, vcs-service, vcs-storage, integrations-salesforce
+- **Services analyzed**: backend, service-a, service-b, integrations-service-c
 - **Time range**: 2025-12-24 10:00-11:00 UTC
 - **Data sources**:
   - `/tmp/backend-logs.json` (GraphQL operations)
-  - `/tmp/vcs-storage-logs.json` (Permission errors)
+  - `/tmp/service-b-logs.json` (Permission errors)
   - `/tmp/integrations-logs.json` (Integration failures)
 
 ### Pattern 1: GraphQL → VCS Permission Error → Integration Failure
@@ -132,27 +132,27 @@ Identified cascade failure pattern: GraphQL mutations trigger vcs-storage permis
 ```
 10:15:20.123  [backend]         GraphQL operation: updateTrack
                                 user_id: mtc3f7SxQBRY2V7KWY0dVWVrvOh2
-                                variables: {teamSlug: "kong", slug: "kgll-236"}
+                                variables: {teamSlug: "example-team", slug: "example-track-a"}
 
-10:15:20.456  [vcs-service]     Processing track update request
+10:15:20.456  [service-a]     Processing track update request
                                 trace_id: fa7de37f7aee80ae17d6fc76edd39bb9
 
-10:15:22.789  [vcs-storage]     ❌ ERROR: PermissionDenied
+10:15:22.789  [service-b]     ❌ ERROR: PermissionDenied
                                 cloudtrace.traces.patch permission denied
                                 trace_id: fa7de37f7aee80ae17d6fc76edd39bb9
 
 10:15:23.012  [integrations]    ⚠️  WARNING: VCS update failed
-                                Upstream error from vcs-service
+                                Upstream error from service-a
                                 trace_id: fa7de37f7aee80ae17d6fc76edd39bb9
 ```
 
 **Pattern**:
 1. User triggers `updateTrack` mutation via GraphQL API
-2. Request flows to vcs-service (success)
-3. vcs-storage attempts to export trace → PermissionDenied (2-3s delay)
+2. Request flows to service-a (success)
+3. service-b attempts to export trace → PermissionDenied (2-3s delay)
 4. Integration service detects upstream failure
 
-**Root Cause**: vcs-storage permission error blocks trace export, but doesn't fail the main operation. Integration service sees the upstream error and logs warning.
+**Root Cause**: service-b permission error blocks trace export, but doesn't fail the main operation. Integration service sees the upstream error and logs warning.
 
 **Evidence**:
 - `/tmp/correlated-events-fa7de37f.json` - Full timeline for this trace
@@ -203,19 +203,19 @@ Other | 6-59   | 3 errors
 ```
 GraphQL (backend)
     ↓ trace_id propagation
-vcs-service
-    ↓ calls vcs-storage
-vcs-storage (FAILS HERE with PermissionDenied)
+service-a
+    ↓ calls service-b
+service-b (FAILS HERE with PermissionDenied)
     ↓ upstream error propagates
-integrations-salesforce
+integrations-service-c
     ↓ logs warning about VCS failure
 ```
 
-**Impact**: Permission error in vcs-storage propagates upstream, affecting all services in the chain. Although main operation succeeds, telemetry is broken and integration services log warnings.
+**Impact**: Permission error in service-b propagates upstream, affecting all services in the chain. Although main operation succeeds, telemetry is broken and integration services log warnings.
 
 ### Recommendations
 
-1. **Immediate**: Fix vcs-storage workload identity (see gcp-analyzer findings)
+1. **Immediate**: Fix service-b workload identity (see gcp-analyzer findings)
 2. **Monitor**: Set up alert for trace export failures
 3. **Investigate**: 15-minute error clustering - check for scheduled jobs
 4. **Long-term**: Implement circuit breaker to prevent cascade propagation
