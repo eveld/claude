@@ -67,9 +67,8 @@ ln -s $(pwd) ~/.claude/plugins/workflows
 ls ~/.claude/plugins/workflows/skills/
 ```
 
-### Installation via Plugin System (Future)
+### Installation via Plugin System
 
-When available:
 ```bash
 /plugin marketplace add eveld/claude
 /plugin install workflows@eveld-claude
