@@ -7,38 +7,9 @@ description: Use when creating pull requests to write clear, structured PR descr
 
 Create structured pull request descriptions that provide context for reviewers.
 
-## Structure
+## Template
 
-```markdown
-## Summary
-[1-2 sentence overview]
-
-## What Changed
-- [Bullet point 1]
-- [Bullet point 2]
-- [Bullet point 3]
-
-## Why
-[Explanation of why this change was needed]
-
-## Testing
-### Automated
-- [x] Unit tests pass
-- [x] Integration tests pass
-- [x] Linting passes
-
-### Manual
-- [x] [Specific manual test performed]
-- [x] [Another manual verification]
-
-## Screenshots
-[If UI changes]
-![Description](url)
-
-## Related Issues
-Closes #123
-Refs #456
-```
+See `templates/pr-description.md` for the full template structure.
 
 ## Sections
 
@@ -57,23 +28,16 @@ Refs #456
 - Problem being solved
 - Why this approach was chosen
 
-### Testing
-Split into Automated and Manual:
-
-**Automated**:
-- Commands that were run
-- All tests that pass
-- CI/CD checks
-
-**Manual**:
-- Specific manual testing performed
-- Edge cases verified
-- Performance testing
-
 ### Screenshots (if applicable)
 - Before/after comparisons for UI changes
 - Error states
 - Different screen sizes/browsers
+
+### Verification
+- Reference the plan and changelog for detailed testing information
+- Format: `See plan: thoughts/NNNN-description/plan.md`
+- Format: `See changelog: thoughts/NNNN-description/changelog.md`
+- Avoids duplicating test information across multiple documents
 
 ### Related Issues
 - Link to tickets: `Closes #123`
@@ -96,18 +60,9 @@ Adds JWT token refresh mechanism to prevent unexpected session expiration. Token
 ## Why
 Users were experiencing unexpected logouts when their sessions expired during active use. This caused data loss and poor UX. Automatic token refresh keeps sessions alive as long as users are active.
 
-## Testing
-### Automated
-- [x] Unit tests pass: `make test`
-- [x] Integration tests pass: `make test-integration`
-- [x] Linting passes: `make lint`
-- [x] Added 8 new tests for refresh flow
-
-### Manual
-- [x] Verified token refreshes 5 minutes before expiry
-- [x] Verified expired tokens redirect to login
-- [x] Verified refresh fails gracefully with invalid tokens
-- [x] Tested with 1-hour active session (multiple refreshes)
+## Verification
+See plan: `thoughts/0001-auth-token-refresh/plan.md`
+See changelog: `thoughts/0001-auth-token-refresh/changelog.md`
 
 ## Related Issues
 Closes #123
@@ -136,7 +91,9 @@ EOF
 ## Benefits
 
 - Reviewers understand context quickly
-- Clear acceptance criteria
-- Testing is documented
+- Clear explanation of what and why
+- Verification details in plan/changelog (single source of truth)
+- Avoids duplicating test information across documents
+- Focused on changes, not testing methodology
 - Easy to reference later
 - Better PR discussions
