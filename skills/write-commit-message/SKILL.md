@@ -7,8 +7,13 @@ description: Use when creating git commits to ensure consistent, clear commit me
 
 Create git commit messages following the Conventional Commits format.
 
-## Format
+## Template
 
+See `templates/commit-message.md` for the full template structure, format rules, and examples.
+
+## Quick Reference
+
+**Format**:
 ```
 <type>(<scope>): <subject>
 
@@ -17,82 +22,13 @@ Create git commit messages following the Conventional Commits format.
 [optional footer]
 ```
 
-## Types
+**Common Types**: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`
 
-- `feat` - New feature
-- `fix` - Bug fix
-- `docs` - Documentation changes
-- `style` - Code style changes (formatting, no logic change)
-- `refactor` - Code refactoring
-- `test` - Adding or updating tests
-- `chore` - Maintenance tasks
-
-## Rules
-
-1. Subject line < 72 characters
-2. Use imperative mood ("add feature" not "added feature")
-3. Don't capitalize first letter of subject
-4. No period at end of subject
-5. Separate subject from body with blank line
-6. Wrap body at 72 characters
-7. Use body to explain what and why, not how
-
-## Examples
-
-**Feature**:
-```
-feat(auth): add JWT token refresh mechanism
-
-Implements automatic token refresh to prevent user sessions from
-expiring unexpectedly. Tokens are refreshed 5 minutes before expiry.
-
-Closes #123
-```
-
-**Bug fix**:
-```
-fix(api): handle null values in user response
-
-Previously crashed when user profile was incomplete. Now returns
-default values for missing fields.
-```
-
-**Refactoring**:
-```
-refactor(auth): extract token validation into separate function
-
-Improves testability and reduces duplication across middleware
-and handlers.
-```
-
-**Tests**:
-```
-test(auth): add tests for token refresh flow
-
-Covers successful refresh, expired token, and invalid token cases.
-```
-
-## Scope
-
-Scope is optional but recommended:
-- Use component/module name: `(auth)`, `(api)`, `(ui)`
-- Use file/package name for small changes: `(user-handler)`
-- Omit if change spans multiple areas
-
-## Body
-
-Include body when:
-- Change is non-obvious
-- Explains why, not what
-- References issues or tickets
-- Breaking changes need explanation
-
-## Footer
-
-Use footer for:
-- `Closes #123` - Closes issue
-- `BREAKING CHANGE:` - Breaking changes
-- `Refs #456` - References related issue
+**Key Rules**:
+- Subject < 72 characters
+- Use imperative mood ("add" not "added")
+- No period at end of subject
+- Body explains what and why, not how
 
 ## Integration with Git Workflow
 

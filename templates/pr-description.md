@@ -1,0 +1,28 @@
+# Pull Request Description Template
+
+## Summary
+{ONE_TO_TWO_SENTENCE_OVERVIEW}
+
+## What Changed
+- {SPECIFIC_CHANGE_1}
+- {SPECIFIC_CHANGE_2}
+- {SPECIFIC_CHANGE_3}
+
+## Why
+{BUSINESS_CONTEXT_OR_TECHNICAL_MOTIVATION}
+
+{PROBLEM_BEING_SOLVED}
+
+{WHY_THIS_APPROACH_WAS_CHOSEN}
+
+## Screenshots
+{IF_UI_CHANGES}
+![{DESCRIPTION}]({URL})
+
+## Verification
+See plan: `thoughts/{FEATURE_SLUG}/plan.md`
+See changelog: `thoughts/{FEATURE_SLUG}/changelog.md`
+
+## Related Issues
+Closes #{ISSUE_NUMBER}
+Refs #{RELATED_ISSUE}
