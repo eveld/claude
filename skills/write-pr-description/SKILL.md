@@ -33,12 +33,6 @@ See `templates/pr-description.md` for the full template structure.
 - Error states
 - Different screen sizes/browsers
 
-### Verification
-- Reference the plan and changelog for detailed testing information
-- Format: `See plan: thoughts/NNNN-description/plan.md`
-- Format: `See changelog: thoughts/NNNN-description/changelog.md`
-- Avoids duplicating test information across multiple documents
-
 ### Related Issues
 - Link to tickets: `Closes #123`
 - Link to related PRs: `Refs #456`
@@ -59,10 +53,6 @@ Adds JWT token refresh mechanism to prevent unexpected session expiration. Token
 
 ## Why
 Users were experiencing unexpected logouts when their sessions expired during active use. This caused data loss and poor UX. Automatic token refresh keeps sessions alive as long as users are active.
-
-## Verification
-See plan: `thoughts/0001-auth-token-refresh/plan.md`
-See changelog: `thoughts/0001-auth-token-refresh/changelog.md`
 
 ## Related Issues
 Closes #123
@@ -92,8 +82,7 @@ EOF
 
 - Reviewers understand context quickly
 - Clear explanation of what and why
-- Verification details in plan/changelog (single source of truth)
-- Avoids duplicating test information across documents
-- Focused on changes, not testing methodology
+- Focused on changes and motivation
+- No duplicate test/verification information
 - Easy to reference later
 - Better PR discussions
