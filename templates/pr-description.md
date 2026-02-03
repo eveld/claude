@@ -19,10 +19,6 @@
 {IF_UI_CHANGES}
 ![{DESCRIPTION}]({URL})
 
-## Verification
-See plan: `thoughts/{FEATURE_SLUG}/plan.md`
-See changelog: `thoughts/{FEATURE_SLUG}/changelog.md`
-
 ## Related Issues
 Closes #{ISSUE_NUMBER}
 Refs #{RELATED_ISSUE}
