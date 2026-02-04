@@ -24,7 +24,7 @@ ln -s $(pwd) ~/.claude/plugins/workflows
 - **`/workflows:research <question>`** - Research codebase using parallel agents, save to personal namespace
 - **`/workflows:plan <research-file>`** - Create implementation plan, auto-discover project commands/tests
 - **`/workflows:implement <plan-file>`** - Execute plan phase by phase with verification
-- **`/workflows:share-docs <path>`** - Share personal documents to team namespace
+- **`/workflows:share <path>`** - Share personal documents to team namespace
 - **`/workflows:upgrade`** - Upgrade plugin from older versions
 
 ### Directory Structure (v1.3.0+)
@@ -70,7 +70,7 @@ thoughts/
 When ready to share personal documents with the team:
 
 ```bash
-/share-docs thoughts/erik/0001-auth-system
+/workflows:share thoughts/erik/0001-auth-system
 
 # Workflow:
 # 1. Pulls latest from git
@@ -98,7 +98,7 @@ This auto-correction loop ensures later phases adapt to earlier changes.
 
 Example:
 ```bash
-/workflows:implement thoughts/0005-authentication/plan.md
+/workflows:implement thoughts/shared/0005-authentication/plan.md
 
 # Agent reads plan.md + changelog.md before each phase
 # Agent adapts based on what actually happened in previous phases

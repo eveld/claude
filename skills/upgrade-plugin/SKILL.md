@@ -49,7 +49,7 @@ AskUserQuestion:
 ### 4. Cross-Reference Updates
 - Scan documents for references to old paths
 - Propose updates to new paths
-- Example: `thoughts/shared/research/2026-01-15-01-auth.md` → `thoughts/0005-authentication/research.md`
+- Example: `thoughts/shared/research/2026-01-15-01-auth.md` → `thoughts/shared/0005-authentication/research.md`
 
 ### 5. Edge Case Handling
 Present edge cases to user using AskUserQuestion:
