@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+**Migration Guide**: The `/workflows:upgrade` command reads this file to understand how to migrate projects between versions. Each version's Migration section contains the steps the upgrade orchestrator will follow.
+
 ## [1.3.0] - 2026-02-03
 
 ### Added
@@ -17,7 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New skills: `determine-feature-slug`, `share-docs`, `update-changelog`, `spawn-implementation-agents`, `upgrade-plugin`
 - New agent: `test-writer` for isolated test generation
 - New templates: `changelog-document.md`
-- Version tracking: `migrations/version.txt`
+- New command: `/workflows:share` to promote personal docs to shared namespace
+- Project-level version tracking: `thoughts/.version` (per-project migration state)
 
 ### Changed
 - Document-writing skills now create documents in personal namespace by default
@@ -59,8 +62,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
    - Test commands with new paths
 
 **Version detection:**
-- v1.2.0/v1.2.2: Only `thoughts/shared/research/` and `thoughts/shared/plans/` exist
-- v1.3.0: `thoughts/shared/NNNN-*/` or `thoughts/{username}/NNNN-*/` directories exist
+- Check `thoughts/.version` file (created by v1.3.0+)
+- If missing, detect from structure:
+  - v1.2.0/v1.2.2: Only `thoughts/shared/research/` and `thoughts/shared/plans/` exist
+  - v1.3.0+: `thoughts/shared/NNNN-*/` or `thoughts/{username}/NNNN-*/` directories exist
 
 **New workflow after upgrade:**
 - Create new docs in personal namespace: `thoughts/{username}/NNNN-*/`
