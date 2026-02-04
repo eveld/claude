@@ -56,6 +56,14 @@ You have access to specialized agents that are MORE EFFICIENT than basic tools. 
 | Web research | `web-search-researcher` |
 | Analyzing errors | `error-analyzer` |
 
+## Implementation Agents
+
+During implementation, use aggressive agent orchestration:
+- See `spawn-implementation-agents` skill for full pattern
+- Keep main agent under 40k tokens per phase
+- Use sub-agents for file reading, pattern finding, testing, verification
+- 60% token reduction per phase
+
 ## When to Use Agents
 
 ### ALWAYS Use Agents For:

@@ -25,6 +25,60 @@ ln -s $(pwd) ~/.claude/plugins/workflows
 - **`/workflows:plan <research-file>`** - Create implementation plan, auto-discover project commands/tests, save to `thoughts/shared/plans/`
 - **`/workflows:implement <plan-file>`** - Execute plan phase by phase with verification
 
+### Directory Structure (v1.3.0+)
+
+Starting with v1.3.0, documents are organized by feature:
+
+```
+thoughts/
+├── 0001-feature-name/      # Feature-centric organization
+│   ├── plan.md              # Implementation plan
+│   ├── research.md          # Research findings
+│   ├── changelog.md         # Implementation tracking
+│   └── notes.md             # Ad-hoc observations
+├── 0002-another-feature/
+│   └── ...
+├── notes/                   # Project-wide references
+│   ├── commands.md          # Available commands
+│   └── testing.md           # Test patterns
+└── shared/                  # Legacy structure (still supported)
+    ├── research/
+    └── plans/
+```
+
+**Backward Compatibility**: Old `thoughts/shared/` structure continues to work.
+
+### Implementation Tracking
+
+During implementation, a changelog tracks actual progress:
+- **Before each phase**: Agent reads `changelog.md` for auto-correction
+- **After each phase**: Agent updates changelog with deviations
+- **At completion**: Agent appends final summary
+
+This auto-correction loop ensures later phases adapt to earlier changes.
+
+Example:
+```bash
+/workflows:implement thoughts/0005-authentication/plan.md
+
+# Agent reads plan.md + changelog.md before each phase
+# Agent adapts based on what actually happened in previous phases
+# Agent updates changelog.md after each phase
+```
+
+### Agent Orchestration
+
+Implementation uses agents to conserve context:
+- **Analysis agents** (parallel) - Gather patterns and architecture
+- **Test writer agent** - Generate tests following conventions
+- **Verification agent** - Run checks and return summary
+
+This keeps the main agent under 40k tokens per phase while enabling larger, more complex phases.
+
+**Token savings**: 60% reduction per phase (92k → 40k in main agent)
+
+See `skills/spawn-implementation-agents/SKILL.md` for full pattern.
+
 ## Skills (24)
 
 Skills guide Claude's behavior automatically:

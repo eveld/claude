@@ -4,6 +4,7 @@ researcher: {RESEARCHER_NAME}
 git_commit: {GIT_COMMIT}
 branch: {BRANCH_NAME}
 repository: {REPOSITORY}
+feature_slug: {FEATURE_SLUG}
 topic: "{RESEARCH_TOPIC}"
 tags: [research, codebase, {TAGS}]
 status: complete

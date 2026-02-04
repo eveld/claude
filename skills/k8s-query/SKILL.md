@@ -38,90 +38,40 @@ echo "Namespace: $CURRENT_NAMESPACE"
 # read -p "Continue with current context? (y/n) " -n 1 -r
 ```
 
-## Common Commands
+## Query Strategy
 
-### 1. Get Resources
+Follow this approach for effective Kubernetes debugging:
+
+1. **Check pod status first**: `kubectl get pods -n <namespace>`
+2. **Check events if pod failing**: `kubectl describe pod <pod-name> -n <namespace>` (events at bottom)
+3. **Check logs if pod running**: `kubectl logs <pod-name> -n <namespace>`
+4. **Check previous logs if crashed**: `kubectl logs <pod-name> --previous -n <namespace>`
+5. **Correlate with GCP logs**: Save K8s events/logs to /tmp, check GCP for service logs
+
+### Example Workflow
+
 ```bash
-# Get all pods in namespace
-kubectl get pods -n <namespace>
-
-# Get pods with labels
+# Step 1: Check pod status
 kubectl get pods -n production -l app=api-gateway
 
-# Get deployments
-kubectl get deployments -n <namespace>
+# Step 2: If pod is failing, describe for events
+kubectl describe pod api-gateway-abc123 -n production
+# Look at Events section at bottom for errors
 
-# Get services
-kubectl get services -n <namespace>
+# Step 3: If pod running but misbehaving, check logs
+kubectl logs api-gateway-abc123 -n production --tail=200
 
-# All resources
-kubectl get all -n <namespace>
+# Step 4: If pod crashed/restarted, check previous logs
+kubectl logs api-gateway-abc123 --previous -n production
+
+# Step 5: Check namespace events for broader context
+kubectl get events -n production --sort-by='.lastTimestamp' | tail -20
 ```
-
-### 2. Describe Resources (Detailed Info)
-```bash
-# Describe pod
-kubectl describe pod <pod-name> -n <namespace>
-
-# Describe deployment
-kubectl describe deployment <deployment-name> -n <namespace>
-
-# Describe service
-kubectl describe service <service-name> -n <namespace>
-```
-
-### 3. Get Logs
-```bash
-# Get pod logs (current)
-kubectl logs <pod-name> -n <namespace>
-
-# Get logs with tail limit
-kubectl logs <pod-name> --tail=200 -n <namespace>
-
-# Get previous container logs (after crash)
-kubectl logs <pod-name> --previous -n <namespace>
-
-# Follow logs (stream)
-kubectl logs -f <pod-name> -n <namespace>
-
-# Logs from specific container in multi-container pod
-kubectl logs <pod-name> -c <container-name> -n <namespace>
-```
-
-### 4. Get Events
-```bash
-# Get events in namespace
-kubectl get events -n <namespace>
-
-# Get events for specific resource
-kubectl get events --field-selector involvedObject.name=<pod-name> -n <namespace>
-
-# Sort by timestamp
-kubectl get events --sort-by='.lastTimestamp' -n <namespace>
-```
-
-### 5. Resource Metrics (if metrics-server installed)
-```bash
-# Pod resource usage
-kubectl top pod -n <namespace>
-
-# Node resource usage
-kubectl top node
-
-# Specific pod metrics
-kubectl top pod <pod-name> -n <namespace>
-```
-
-## Output Formats
-
-- `-o wide` - Additional columns (IP, node, etc.)
-- `-o yaml` - Full YAML output
-- `-o json` - Full JSON output
-- `-o jsonpath='{.items[*].metadata.name}'` - Custom field extraction
 
 ## Output Management
 
-**For large outputs or consecutive analysis**, pipe to tmp file:
+For large outputs or correlation with other tools, save to tmp file:
+
 ```bash
 # Save pod list to tmp file
 kubectl get pods -n production -o json > /tmp/k8s-pods-$(date +%Y%m%d-%H%M%S).json
@@ -132,7 +82,7 @@ kubectl logs api-gateway-xyz -n production --tail=1000 > /tmp/api-gateway-logs-$
 # Save events for correlation
 kubectl get events -n production --sort-by='.lastTimestamp' > /tmp/k8s-events-$(date +%Y%m%d-%H%M%S).txt
 
-# Then analyze with grep, jq, or correlate with GCP logs
+# Then analyze or correlate with GCP logs
 grep -i error /tmp/api-gateway-logs-*.log
 ```
 
@@ -141,11 +91,37 @@ grep -i error /tmp/api-gateway-logs-*.log
 - Share debugging context with team
 - Preserve state for investigation
 
+## Common Patterns
+
+For detailed command reference, see:
+- [kubectl command patterns](references/COMMANDS.md) - Get, describe, logs, events, metrics
+
+### Quick Reference
+
+```bash
+# Get pods in namespace
+kubectl get pods -n <namespace>
+
+# Describe pod (includes events)
+kubectl describe pod <pod-name> -n <namespace>
+
+# Get pod logs
+kubectl logs <pod-name> -n <namespace> --tail=200
+
+# Get previous logs (after crash)
+kubectl logs <pod-name> --previous -n <namespace>
+
+# Get events
+kubectl get events -n <namespace> --sort-by='.lastTimestamp'
+```
+
 ## Tips
 
 - Use `-n <namespace>` for all commands or set default: `kubectl config set-context --current --namespace=<namespace>`
 - Use `--all-namespaces` or `-A` to search across all namespaces
 - Use `-l` for label selectors: `-l app=api,tier=frontend`
-- Use `--field-selector` for field-based filtering
-- Check pod events with describe before checking logs
-- For debugging sessions, save logs/events to /tmp for correlation across tools
+- Use `--field-selector` for field-based filtering (e.g., `status.phase=Failed`)
+- Check pod events with describe before checking logs (events show scheduling/startup issues)
+- For debugging sessions, save logs/events to /tmp for correlation with GCP logs
+- Use `-o wide` for additional columns (pod IP, node name)
+- Use `-o json` or `-o yaml` for full resource definitions

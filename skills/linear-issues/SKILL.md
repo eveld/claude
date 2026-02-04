@@ -37,7 +37,7 @@ linearis issues list --limit 1 >/dev/null 2>&1 || {
 
 ## Common Commands
 
-### 1. Read Issue Details
+### Read Issue Details
 ```bash
 # Get issue by ID or identifier
 linearis issues read ENG-1234
@@ -51,7 +51,7 @@ linearis issues read ENG-1234 | jq '.state.name'
 linearis issues read ENG-1234 | jq '.'
 ```
 
-### 2. List Issues
+### List Issues
 ```bash
 # List recent issues (default limit: 25)
 linearis issues list
@@ -64,7 +64,7 @@ linearis issues list --limit 100
 linearis issues list --limit 50 > /tmp/linear-issues-$(date +%Y%m%d).json
 ```
 
-### 3. Search Issues
+### Search Issues
 ```bash
 # Search by text query
 linearis issues search "api-gateway error"
@@ -93,13 +93,14 @@ linearis issues read ENG-1234 | jq -r '.assignee.name'
 # Extract labels
 linearis issues read ENG-1234 | jq -r '.labels[].name'
 
-# Extract comments (if included)
-linearis issues read ENG-1234 | jq -r '.comments[]'
+# Extract priority (0=None, 1=Low, 2=Medium, 3=High, 4=Urgent)
+linearis issues read ENG-1234 | jq -r '.priority'
 ```
 
 ## Output Management
 
-**Save issue details for debugging context**:
+Save issue details for debugging context:
+
 ```bash
 # Save issue to tmp file
 linearis issues read ENG-1234 > /tmp/linear-issue-ENG-1234-$(date +%Y%m%d).json
@@ -123,141 +124,33 @@ echo "Debugging: $ISSUE_DESC"
 - Share investigation files with team
 - Correlate issue reports with logs/events
 
-## Advanced Filtering with jq
+## Advanced Filtering
 
-### 4. Filter Issues by Criteria
+For detailed jq filtering patterns, see:
+- [jq patterns for filtering and analysis](references/JQ-PATTERNS.md)
+
+### Quick Reference
 
 ```bash
-# Filter by team key
+# Filter by team
 linearis issues list --limit 200 | jq '[.[] | select(.team.key == "ENG")]'
-
-# Filter by label name
-linearis issues list --limit 200 | jq '[.[] | select(.labels[]?.name == "FileB")]'
 
 # Filter by state
 linearis issues list --limit 200 | jq '[.[] | select(.state.name == "In Progress")]'
 
-# Filter by assignee
-linearis issues list --limit 200 | jq '[.[] | select(.assignee.name == "John Doe")]'
+# Filter by label
+linearis issues list --limit 200 | jq '[.[] | select(.labels[]?.name == "Bug")]'
 
-# Filter by project
-linearis issues list --limit 200 | jq '[.[] | select(.project.name == "Platform Pain 🤯")]'
+# Search in description
+linearis issues list --limit 200 | jq '[.[] | select(has("description") and (.description | contains("error")))]'
 
-# Multiple conditions (issues with FileB label in ENG team)
-linearis issues list --limit 200 | jq '[.[] | select(.team.key == "ENG" and (.labels[]?.name == "FileB"))]'
-```
-
-### 5. Search Description Content
-
-```bash
-# Find issues containing Slack/Unthread links (support tickets)
-linearis issues list --limit 200 | jq '[.[] | select(has("description") and (.description | contains("example.slack.com") or contains("unthread.io")))]'
-
-# Find issues mentioning specific error messages
-linearis issues list --limit 200 | jq '[.[] | select(has("description") and (.description | contains("host for this script was not found")))]'
-
-# Case-insensitive search in description
-linearis issues list --limit 200 | jq '[.[] | select(has("description") and (.description | ascii_downcase | contains("error")))]'
-```
-
-### 6. Extract Unique Values
-
-```bash
-# Get all unique labels
-linearis issues list --limit 200 | jq '[.[].labels[]? | {id, name}] | unique_by(.id) | sort_by(.name)'
-
-# Get all unique projects
-linearis issues list --limit 200 | jq '[.[] | select(has("project")) | .project] | unique_by(.id) | sort_by(.name)'
-
-# Get all unique teams
-linearis issues list --limit 200 | jq '[.[].team | {id, key, name}] | unique_by(.id) | sort_by(.name)'
-
-# Get all unique states
-linearis issues list --limit 200 | jq '[.[].state | {id, name}] | unique_by(.id) | sort_by(.name)'
-```
-
-### 7. Count and Group Issues
-
-```bash
-# Count issues by label
-linearis issues list --limit 200 | jq '[.[].labels[]?] | group_by(.name) | map({label: .[0].name, count: length}) | sort_by(-.count)'
-
-# Count issues by team
-linearis issues list --limit 200 | jq 'group_by(.team.key) | map({team: .[0].team.key, count: length}) | sort_by(-.count)'
-
-# Count issues by state
-linearis issues list --limit 200 | jq 'group_by(.state.name) | map({state: .[0].state.name, count: length})'
-
-# Count issues by priority
-linearis issues list --limit 200 | jq 'group_by(.priority) | map({priority: .[0].priority, count: length}) | sort_by(.priority)'
-```
-
-### 8. Complex Multi-Field Extraction
-
-```bash
-# Extract issue summary with multiple fields
+# Extract summary
 linearis issues list --limit 50 | jq '.[] | {
   id: .identifier,
   title: .title,
-  team: .team.key,
   state: .state.name,
-  priority: .priority,
-  labels: [.labels[]?.name],
-  project: .project.name // "No project",
-  assignee: .assignee.name // "Unassigned",
-  created: .createdAt,
-  updated: .updatedAt
-}'
-
-# Save to CSV-like format
-linearis issues list --limit 50 | jq -r '.[] | [
-  .identifier,
-  .title,
-  .team.key,
-  .state.name,
-  .priority,
-  (.labels[]?.name // "" | join(",")),
-  .project.name // "No project"
-] | @csv' > /tmp/linear-issues.csv
-```
-
-## Common Patterns for Support Tickets
-
-### Finding Support-Related Issues
-
-```bash
-# Issues with Unthread/Slack links (likely support tickets)
-linearis issues list --limit 200 | jq '[.[] | select(has("description") and (.description | contains("unthread.io") or contains("slack.com")))]' > /tmp/support-tickets.json
-
-# Issues from specific team (e.g., support team)
-linearis issues list --limit 200 | jq '[.[] | select(.team.key == "SUPPORT")]'
-
-# Issues with specific labels indicating support work
-linearis issues list --limit 200 | jq '[.[] | select(.labels[]?.name == "Support" or .labels[]?.name == "Bug")]'
-
-# Combine: Support team + Slack links + In Progress
-linearis issues list --limit 200 | jq '[.[] | select(
-  .team.key == "SUPPORT" and
-  .state.name == "In Progress" and
-  (has("description") and (.description | contains("slack.com")))
-)]'
-```
-
-## Handling Null/Missing Fields
-
-```bash
-# Check if field exists before accessing
-linearis issues list --limit 200 | jq '[.[] | select(has("project"))]'
-
-# Use // operator for default values
-linearis issues list --limit 200 | jq '.[] | {
-  id: .identifier,
-  project: .project.name // "No project",
   assignee: .assignee.name // "Unassigned"
 }'
-
-# Safe navigation with ? operator for arrays
-linearis issues list --limit 200 | jq '.[] | .labels[]?.name'  # Won't error if labels is null
 ```
 
 ## Tips
@@ -268,8 +161,9 @@ linearis issues list --limit 200 | jq '.[] | .labels[]?.name'  # Won't error if 
 - Search results are limited - use specific queries
 - Issue descriptions often contain error messages, stack traces, or reproduction steps
 - Check issue labels for environment info (production, staging, etc.)
-- Use `has("field")` to check field existence before accessing
+- Use `has("field")` in jq to check field existence before accessing
 - Use `//` operator in jq for default values when fields might be null
 - Use `?` operator for safe array/object navigation (e.g., `.labels[]?`)
 - Save filtered results to files for further analysis
 - Increase `--limit` (max usually 200) for comprehensive searches
+- Priority values: 0=None, 1=Low, 2=Medium, 3=High, 4=Urgent

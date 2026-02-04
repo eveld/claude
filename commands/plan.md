@@ -5,17 +5,20 @@ You are creating a detailed implementation plan through an interactive process.
 ## Initial Response
 
 Check if parameters were provided:
-- If file path or ticket provided: Read files FULLY and begin research
+- If file path provided: Read FULLY and check format
+  - New format: `thoughts/NNNN-description/research.md`
+  - Old format: `thoughts/shared/research/YYYY-MM-DD-NN-*.md`
 - If no parameters: Show usage message and wait
 
 Usage message:
 ```
 I'll help you create a detailed implementation plan. Please provide:
-1. The task/ticket description (or path to ticket file)
+1. The task/ticket description (or path to research/ticket file)
 2. Any relevant context or requirements
 3. Links to related research
 
-Tip: You can invoke with a file: `/plan thoughts/tickets/eng_1234.md`
+Tip: You can invoke with a file: `/plan thoughts/0005-authentication/research.md`
+Tip: Old paths also work: `/plan thoughts/shared/research/2026-02-03-01-auth.md`
 ```
 
 ## Workflow
@@ -52,14 +55,22 @@ Tip: You can invoke with a file: `/plan thoughts/tickets/eng_1234.md`
 ### Step 7: Collaborate on Approach
 - Present design options with pros/cons
 - Get user buy-in on structure
-- Agree on phases before writing
+- **Ask about milestone grouping**:
+  - Should phases be grouped into milestones?
+  - What are the user-facing outcomes?
+  - Where are natural testing/validation points?
+- Agree on phases AND milestones before writing
 
 ### Step 8: Gather Metadata
 - Use `gather-project-metadata` skill
 
 ### Step 9: Write Plan
+- Use `determine-feature-slug` skill to get/create feature slug
+  - If from existing research doc: Use same slug (reuse directory)
+  - If new: Prompt for new slug
 - Use `write-plan-doc` skill to create structured plan
-- File path: `thoughts/shared/plans/YYYY-MM-DD-NN-description.md`
+- File path: `thoughts/NNNN-description/plan.md` (new structure)
+- Old structure paths still supported for reading
 - Reference templates for structure
 
 ### Step 10: Review and Iterate

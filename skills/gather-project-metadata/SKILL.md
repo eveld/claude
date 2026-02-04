@@ -14,6 +14,7 @@ Collect metadata for documentation frontmatter.
 - Git branch name
 - Repository name
 - Project name (from directory or package.json)
+- Feature slug (if in feature directory context)
 
 ## How to Gather
 
@@ -36,6 +37,12 @@ git remote get-url origin | sed 's/.*[:/]\(.*\)\.git/\1/'
 
 # Project name
 basename $(pwd)
+
+# Feature slug (if applicable)
+FEATURE_DIR=$(pwd | grep -oE 'thoughts/[0-9]{4}-[^/]+' || echo "")
+if [ -n "$FEATURE_DIR" ]; then
+    basename "$FEATURE_DIR"
+fi
 ```
 
 ## Usage in Documents
@@ -60,3 +67,4 @@ When using templates, replace these placeholders:
 - `{REPOSITORY}` - Repository path
 - `{PROJECT_NAME}` - Project name
 - `{DATE}` - Simple date (YYYY-MM-DD)
+- `{FEATURE_SLUG}` - Feature slug (e.g., "0005-authentication")

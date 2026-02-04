@@ -59,6 +59,28 @@ Use the discovered patterns for:
 - Use same mocking library (mockery, jest.mock, unittest.mock)
 - Follow interface/class mocking patterns found in codebase
 
+## Alternative: Use Test-Writer Agent
+
+For complex test generation, spawn the test-writer agent:
+
+```markdown
+Task(subagent_type="workflows:test-writer",
+     prompt="Generate tests for [functions] following patterns in testing.md.
+     Expected behavior: [describe].
+     Return test code only.")
+```
+
+**Benefits**:
+- Conserves main agent context (3k instead of 20k+)
+- Agent reads testing.md and examples in isolation
+- Returns only the test code you need
+- Follows project patterns automatically
+
+**When to use**:
+- Generating multiple test files
+- Complex table-driven tests
+- During phased implementation (see `spawn-implementation-agents`)
+
 ### 4. Verify Consistency
 
 After writing tests, verify:

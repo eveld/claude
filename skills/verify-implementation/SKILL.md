@@ -15,6 +15,42 @@ Check `thoughts/notes/commands.md` (created by `discover-project-commands` skill
 - Build commands
 - Other project-specific verification
 
+## IMPORTANT: Always Use Verification Agent
+
+**DO NOT run verification commands directly in main context.**
+
+Spawn a verification agent to run checks and return summary:
+
+```markdown
+Task(subagent_type="Bash",
+     prompt="Run verification commands from plan success criteria:
+     - make test
+     - make lint
+     - make build
+     [list all automated checks from plan]
+
+     Return concise summary:
+     - If all pass: ✅ All verification passed
+     - If any fail: ❌ Verification failed
+       - List ONLY the failing checks
+       - Include first few lines of error
+       - Omit stack traces and verbose output
+
+     Maximum output: 2k tokens")
+```
+
+**Why use an agent**:
+- Raw output can be 10k+ tokens (floods main agent context)
+- Agent filters to only essential info (1-2k tokens)
+- Keeps main agent focused on implementation
+- Part of token management strategy (see `spawn-implementation-agents`)
+
+**Agent returns**:
+- ✅ Pass status or ❌ Fail status
+- Only failed checks (not successful ones)
+- First few lines of errors (not full output)
+- Actionable information only
+
 ## Common Verification Steps
 
 ### 1. Run Tests
@@ -72,3 +108,9 @@ make build
 # All pass? Mark phase complete in plan
 # Any fail? Debug and fix before proceeding
 ```
+
+## Important
+
+Always spawn agent for verification - never run commands directly in main context.
+
+See `spawn-implementation-agents` skill for full orchestration pattern.

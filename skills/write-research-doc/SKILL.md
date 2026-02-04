@@ -13,6 +13,7 @@ Use the template from `templates/research-document.md`:
 
 1. **Frontmatter** (YAML):
    - date, researcher, git info, topic, tags, status
+   - **NEW**: feature_slug (e.g., "0005-authentication")
 
 2. **Research Question**:
    - Original user query verbatim
@@ -36,14 +37,20 @@ Use the template from `templates/research-document.md`:
 
 ## File Path and Naming
 
-Save to: `thoughts/shared/research/YYYY-MM-DD-NN-description.md`
+Determine feature slug first using `determine-feature-slug` skill:
+- Auto-detects next number (0001, 0002, etc.)
+- Suggests description from research question
+- Prompts user to accept or customize
 
-Format:
-- `YYYY-MM-DD` - Today's date
-- `NN` - Sequence number (01, 02, etc.)
-- `description` - Kebab-case brief description
+Save to: `thoughts/NNNN-description/research.md`
 
-Example: `2025-12-23-01-authentication-flow.md`
+Example workflow:
+1. User provides research question: "How does authentication work?"
+2. Skill suggests: `0005-authentication`
+3. User accepts or modifies
+4. Document saved to: `thoughts/0005-authentication/research.md`
+
+**Backward compatibility**: Old path `thoughts/shared/research/YYYY-MM-DD-NN-description.md` still recognized by all commands.
 
 ## Metadata Collection
 
