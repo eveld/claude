@@ -1,13 +1,20 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Find next feature number
-NEXT_NUM=$(ls -1 thoughts/ 2>/dev/null | grep -E '^[0-9]{4}-' | sort -r | head -1 | cut -d'-' -f1 || echo "0000")
+# Determine namespace (default to git user)
+NAMESPACE="${1:-}"
+if [ -z "$NAMESPACE" ]; then
+    NAMESPACE=$(git config user.name 2>/dev/null | tr '[:upper:]' '[:lower:]' | tr ' ' '-' || echo "default")
+fi
+
+# Find next feature number in personal namespace
+NEXT_NUM=$(ls -1 "thoughts/${NAMESPACE}/" 2>/dev/null | grep -E '^[0-9]{4}-' | sort -r | head -1 | cut -d'-' -f1 || echo "0000")
 NEXT_NUM=$(printf "%04d" $((10#${NEXT_NUM} + 1)))
 
-# Get suggested description from argument or prompt
-SUGGESTED="${1:-}"
+# Get suggested description from second argument or prompt
+SUGGESTED="${2:-}"
 if [ -z "$SUGGESTED" ]; then
+    echo "Namespace: ${NAMESPACE}"
     echo "Next feature number: $NEXT_NUM"
     read -p "Enter feature description (kebab-case): " SUGGESTED
 fi
@@ -25,5 +32,8 @@ if [ ${#DESC} -lt 3 ] || [ ${#DESC} -gt 50 ]; then
     exit 1
 fi
 
-# Output slug
-echo "${NEXT_NUM}-${DESC}"
+# Create directory in personal namespace
+mkdir -p "thoughts/${NAMESPACE}/${NEXT_NUM}-${DESC}"
+
+# Output slug with namespace
+echo "${NAMESPACE}/${NEXT_NUM}-${DESC}"

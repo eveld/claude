@@ -2,6 +2,9 @@
 
 <!-- Feature: {FEATURE_SLUG} -->
 <!-- Created: {ISO_TIMESTAMP} -->
+<!-- Added by share-docs when shared: -->
+<!-- Shared-As: {SHARED_SLUG} -->
+<!-- Shared-Date: {ISO_DATE} -->
 
 ## Overview
 {BRIEF_DESCRIPTION}

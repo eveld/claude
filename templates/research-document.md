@@ -10,6 +10,9 @@ tags: [research, codebase, {TAGS}]
 status: complete
 last_updated: {DATE}
 last_updated_by: {RESEARCHER_NAME}
+# Added by share-docs skill when shared:
+# shared_as: {SHARED_SLUG}
+# shared_date: {ISO_DATE}
 ---
 
 # Research: {RESEARCH_TOPIC}

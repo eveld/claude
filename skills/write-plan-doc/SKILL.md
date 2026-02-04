@@ -29,15 +29,17 @@ Use the template from `templates/plan-document.md`:
 
 Determine feature slug first using `determine-feature-slug` skill:
 - If implementing from existing research: Use same slug (same directory)
-- If new feature: Auto-detect next number, suggest description from plan title
+- If new feature: Auto-detect namespace and next number, suggest description from plan title
 - Prompts user to accept or customize
 
-Save to: `thoughts/NNNN-description/plan.md`
+Save to: `thoughts/{namespace}/NNNN-description/plan.md`
 
 Example workflow:
-1. Planning from research doc `thoughts/0005-authentication/research.md`
-2. Skill suggests: `0005-authentication` (same directory)
-3. Document saved to: `thoughts/0005-authentication/plan.md`
+1. Planning from research doc `thoughts/erik/0005-authentication/research.md`
+2. Skill suggests: `erik/0005-authentication` (same directory)
+3. Document saved to: `thoughts/erik/0005-authentication/plan.md`
+
+**Collaboration**: Plans start in personal namespace. Use `share-docs` skill to promote to `thoughts/shared/` when ready for team implementation.
 
 **Backward compatibility**: Old path `thoughts/shared/plans/YYYY-MM-DD-NN-description.md` still recognized.
 

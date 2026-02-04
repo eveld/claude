@@ -27,26 +27,63 @@ ln -s $(pwd) ~/.claude/plugins/workflows
 
 ### Directory Structure (v1.3.0+)
 
-Starting with v1.3.0, documents are organized by feature:
+Starting with v1.3.0, documents use personal/shared namespaces for collaboration:
 
 ```
 thoughts/
-├── 0001-feature-name/      # Feature-centric organization
-│   ├── plan.md              # Implementation plan
-│   ├── research.md          # Research findings
-│   ├── changelog.md         # Implementation tracking
-│   └── notes.md             # Ad-hoc observations
-├── 0002-another-feature/
-│   └── ...
-├── notes/                   # Project-wide references
-│   ├── commands.md          # Available commands
-│   └── testing.md           # Test patterns
-└── shared/                  # Legacy structure (still supported)
-    ├── research/
-    └── plans/
+├── erik/                    # Personal workspace (WIP)
+│   ├── 0001-auth-system/
+│   │   ├── research.md
+│   │   ├── plan.md
+│   │   └── changelog.md
+│   └── 0002-api-redesign/
+│       └── research.md
+├── alice/                   # Another developer's workspace
+│   └── 0001-cache-layer/
+│       └── research.md
+├── shared/                  # Published team documents
+│   ├── 0042-auth-system/   # Shared from erik/0001
+│   │   ├── research.md
+│   │   ├── plan.md
+│   │   └── changelog.md
+│   ├── 0043-cache-layer/   # Shared from alice/0001
+│   │   └── research.md
+│   ├── research/            # Legacy: Old research documents
+│   └── plans/               # Legacy: Old implementation plans
+└── notes/                   # Project-wide references
+    ├── commands.md
+    └── testing.md
 ```
 
+**Collaboration Model**:
+- **Personal namespace** (`thoughts/{username}/`): Work-in-progress, each developer has own numbering
+- **Shared namespace** (`thoughts/shared/`): Published docs with canonical team numbering
+- **No conflicts**: Personal numbering never conflicts between developers
+- **Explicit sharing**: Use `/share-docs` to promote personal docs to shared space
+
 **Backward Compatibility**: Old `thoughts/shared/` structure continues to work.
+
+### Sharing Documents
+
+When ready to share personal documents with the team:
+
+```bash
+/share-docs thoughts/erik/0001-auth-system
+
+# Workflow:
+# 1. Pulls latest from git
+# 2. Finds next shared number (e.g., 0042)
+# 3. Copies erik/0001-auth-system → shared/0042-auth-system
+# 4. Updates frontmatter in both copies
+# 5. Commits and pushes immediately
+# 6. Reports: ✅ Shared erik/0001-auth-system → shared/0042-auth-system
+```
+
+**Benefits**:
+- Zero numbering conflicts during development
+- Atomic sharing with git push
+- Clear distinction between WIP and published docs
+- Personal copy preserved with reference to shared location
 
 ### Implementation Tracking
 

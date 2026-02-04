@@ -13,7 +13,8 @@ Use the template from `templates/research-document.md`:
 
 1. **Frontmatter** (YAML):
    - date, researcher, git info, topic, tags, status
-   - **NEW**: feature_slug (e.g., "0005-authentication")
+   - feature_slug (e.g., "erik/0005-authentication" for personal, "0042-authentication" for shared)
+   - Optional: shared_as, shared_date (added by share-docs skill)
 
 2. **Research Question**:
    - Original user query verbatim
@@ -38,17 +39,21 @@ Use the template from `templates/research-document.md`:
 ## File Path and Naming
 
 Determine feature slug first using `determine-feature-slug` skill:
-- Auto-detects next number (0001, 0002, etc.)
+- Auto-detects namespace from git user.name
+- Auto-detects next number in personal namespace (0001, 0002, etc.)
 - Suggests description from research question
 - Prompts user to accept or customize
 
-Save to: `thoughts/NNNN-description/research.md`
+Save to: `thoughts/{namespace}/NNNN-description/research.md`
 
 Example workflow:
 1. User provides research question: "How does authentication work?"
-2. Skill suggests: `0005-authentication`
-3. User accepts or modifies
-4. Document saved to: `thoughts/0005-authentication/research.md`
+2. Skill detects namespace: `erik` (from git config)
+3. Skill suggests: `erik/0005-authentication`
+4. User accepts or modifies
+5. Document saved to: `thoughts/erik/0005-authentication/research.md`
+
+**Collaboration**: Documents start in personal namespace. Use `share-docs` skill to promote to `thoughts/shared/` when ready for team review.
 
 **Backward compatibility**: Old path `thoughts/shared/research/YYYY-MM-DD-NN-description.md` still recognized by all commands.
 

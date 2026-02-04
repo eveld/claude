@@ -37,10 +37,11 @@ Then wait for the user's research query.
 - Use the `gather-project-metadata` skill to collect git info, timestamps
 
 ### Step 6: Write Document
-- Use `determine-feature-slug` skill to get feature slug
+- Use `determine-feature-slug` skill to get feature slug (includes personal namespace)
 - Use the `write-research-doc` skill to create properly structured document
-- File path: `thoughts/NNNN-description/research.md` (new structure)
-- Old structure `thoughts/shared/research/YYYY-MM-DD-NN-description.md` still supported
+- File path: `thoughts/{namespace}/NNNN-description/research.md` (personal workspace)
+- Use `share-docs` skill later to promote to `thoughts/shared/` for team collaboration
+- Old structure `thoughts/shared/research/YYYY-MM-DD-NN-description.md` still supported for reading
 
 ### Step 7: Present Results
 - Show document path

@@ -6,7 +6,8 @@ You are implementing an approved plan systematically.
 
 Check if parameters were provided:
 - If plan file provided: Detect format and read FULLY
-  - New format: `thoughts/NNNN-description/plan.md`
+  - Personal format: `thoughts/{namespace}/NNNN-description/plan.md`
+  - Shared format: `thoughts/shared/NNNN-description/plan.md`
   - Old format: `thoughts/shared/plans/YYYY-MM-DD-NN-*.md`
 - If no parameters: Show usage message and wait
 
@@ -14,7 +15,8 @@ Usage message:
 ```
 I'll help you implement an approved plan. Please provide the path to the plan file.
 
-Example (new format): `/implement thoughts/0005-authentication/plan.md`
+Example (personal): `/implement thoughts/erik/0005-authentication/plan.md`
+Example (shared): `/implement thoughts/shared/0042-authentication/plan.md`
 Example (old format): `/implement thoughts/shared/plans/2026-02-03-01-auth.md`
 ```
 
@@ -27,7 +29,8 @@ Example (old format): `/implement thoughts/shared/plans/2026-02-03-01-auth.md`
 - Understand all phases and success criteria
 
 ### Step 2: Read Context Documents
-- **Read changelog** if it exists: `thoughts/NNNN-description/changelog.md`
+- **Read changelog** if it exists in same directory as plan: `changelog.md`
+  - Works for both personal and shared paths
   - Understand what's been completed so far
   - Note deviations from previous phases
   - Adapt current phase based on actual state (auto-correction)

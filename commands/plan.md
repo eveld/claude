@@ -6,7 +6,8 @@ You are creating a detailed implementation plan through an interactive process.
 
 Check if parameters were provided:
 - If file path provided: Read FULLY and check format
-  - New format: `thoughts/NNNN-description/research.md`
+  - Personal format: `thoughts/{namespace}/NNNN-description/research.md`
+  - Shared format: `thoughts/shared/NNNN-description/research.md`
   - Old format: `thoughts/shared/research/YYYY-MM-DD-NN-*.md`
 - If no parameters: Show usage message and wait
 
@@ -17,7 +18,8 @@ I'll help you create a detailed implementation plan. Please provide:
 2. Any relevant context or requirements
 3. Links to related research
 
-Tip: You can invoke with a file: `/plan thoughts/0005-authentication/research.md`
+Tip: You can invoke with a file: `/plan thoughts/erik/0005-authentication/research.md`
+Tip: Shared docs work too: `/plan thoughts/shared/0042-authentication/research.md`
 Tip: Old paths also work: `/plan thoughts/shared/research/2026-02-03-01-auth.md`
 ```
 
@@ -65,11 +67,12 @@ Tip: Old paths also work: `/plan thoughts/shared/research/2026-02-03-01-auth.md`
 - Use `gather-project-metadata` skill
 
 ### Step 9: Write Plan
-- Use `determine-feature-slug` skill to get/create feature slug
+- Use `determine-feature-slug` skill to get/create feature slug (includes namespace)
   - If from existing research doc: Use same slug (reuse directory)
-  - If new: Prompt for new slug
+  - If new: Prompt for new slug in personal namespace
 - Use `write-plan-doc` skill to create structured plan
-- File path: `thoughts/NNNN-description/plan.md` (new structure)
+- File path: `thoughts/{namespace}/NNNN-description/plan.md` (personal workspace)
+- Use `share-docs` skill later to promote to `thoughts/shared/` for team implementation
 - Old structure paths still supported for reading
 - Reference templates for structure
 

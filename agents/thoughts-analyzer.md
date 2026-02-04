@@ -31,8 +31,10 @@ You are a specialist at extracting HIGH-VALUE insights from thoughts documents. 
 ### Step 1: Read with Purpose
 - Read the entire document first
 - Identify the document's format:
-  - **New format**: `thoughts/NNNN-description/*.md` with feature_slug in frontmatter
-  - **Old format**: `thoughts/shared/*/*.md` with timestamped filenames
+  - **Personal**: `thoughts/{username}/NNNN-slug/*.md` (work-in-progress, may be incomplete)
+  - **Shared**: `thoughts/shared/NNNN-slug/*.md` (published team docs, reviewed)
+  - **Legacy**: `thoughts/shared/*/*.md` with timestamped filenames
+- Check frontmatter for feature_slug, shared_as, status
 - Identify the document's main goal
 - Note the date and context
 - Understand what question it was answering
