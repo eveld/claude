@@ -2,7 +2,7 @@
 
 ## Overview
 
-Restructure the workflows plugin to support feature-centric directory organization, implement changelog tracking with auto-correction loops, add milestone grouping to plans, and introduce aggressive agent orchestration for context window management. This delivers the full vision from research document `thoughts/shared/research/2026-02-03-01-plugin-restructuring-and-improvements.md`.
+Restructure the workflows plugin to support feature-centric directory organization, implement changelog tracking with auto-correction loops, add milestone grouping to plans, and introduce aggressive agent orchestration for context window management. This delivers the full vision from research document `thoughts/shared/0001-plugin-restructuring/research.md`.
 
 ## Current State Analysis
 

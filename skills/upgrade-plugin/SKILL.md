@@ -25,7 +25,7 @@ Called by `/workflows:upgrade` command to handle the upgrade process.
 - Find non-standard formats or edge cases
 
 ### 3. Grouping Recommendations
-Use research topics and plan titles to suggest feature groupings:
+Use research topics and plan titles to suggest feature groupings, then use AskUserQuestion:
 
 **Example**:
 ```
@@ -38,7 +38,12 @@ Recommendation: Group as feature 0005-authentication
 - research.md: Combine JWT + OAuth research (most recent approach)
 - plan.md: Use authentication system plan
 
-Approve grouping? [Yes/Custom]
+AskUserQuestion:
+  question: "Accept proposed grouping for authentication documents?"
+  header: "Grouping"
+  options:
+    - "Accept" - Use recommended grouping (0005-authentication)
+    - "Modify" - Let me specify different grouping or feature name
 ```
 
 ### 4. Cross-Reference Updates
@@ -47,32 +52,39 @@ Approve grouping? [Yes/Custom]
 - Example: `thoughts/shared/research/2026-01-15-01-auth.md` → `thoughts/0005-authentication/research.md`
 
 ### 5. Edge Case Handling
-Present edge cases to user:
+Present edge cases to user using AskUserQuestion:
 
 **Non-standard frontmatter**:
 ```
-Document has custom field "owner: alice"
-- Preserve in new location?
-- Standardize to new format?
+AskUserQuestion:
+  question: "Document has custom field 'owner: alice'. How should we handle it?"
+  header: "Frontmatter"
+  options:
+    - "Preserve" - Keep custom field in migrated document
+    - "Remove" - Use only standard frontmatter fields
 ```
 
 **Orphaned documents**:
 ```
-Found plan without related research
-- Create standalone feature directory?
-- Pair with related research?
+AskUserQuestion:
+  question: "Found plan without related research. How should we migrate it?"
+  header: "Orphaned Doc"
+  options:
+    - "Standalone" - Create separate feature directory
+    - "Group" - Pair with existing related research
 ```
 
 ### 6. Migration Execution
 - Run `scripts/migrate-thoughts.sh` for standard cases
 - Apply user-approved groupings
-- Update cross-references
-- Add feature_slug to frontmatter
-- Preserve originals
+- Update cross-references to point to new paths
+- Don't modify frontmatter (no new metadata fields)
+- Preserve originals in legacy locations
 
-### 7. Report Generation
+### 7. Report Generation and Cleanup
+Generate migration report showing what was done:
 ```markdown
-# Upgrade Report: v1.2.0 → v1.3.0
+# Migration Report: v1.2.0 → v1.3.0
 
 ## Summary
 - Migrated: 15 documents
@@ -85,15 +97,23 @@ Found plan without related research
 - 0002-rate-limiting (research only)
 - 0003-webhook-system (plan only)
 [...]
+```
 
-## Manual Review Needed
-- Cross-reference in thoughts/0001-authentication/plan.md line 45
-  references deleted file - verify still valid
-- Custom frontmatter preserved in 0002-rate-limiting/research.md
+**After showing report, ask user about cleanup using AskUserQuestion**:
+```
+AskUserQuestion:
+  question: "Migration complete. Delete the original files from legacy locations?"
+  header: "Cleanup"
+  options:
+    - "Yes, delete legacy files" - Remove thoughts/shared/research/ and thoughts/shared/plans/ directories
+    - "No, keep them" - Preserve original files as reference
+```
 
-## Cleanup (Optional)
-Original files preserved in thoughts/shared/
-After verification, can delete: `rm -rf thoughts/shared/`
+If user selects "Yes, delete legacy files":
+```bash
+rm -rf thoughts/shared/research/ thoughts/shared/plans/
+git add thoughts/
+git commit -m "chore: remove legacy document structure after v1.3.0 migration"
 ```
 
 ## Important Guidelines

@@ -26,9 +26,17 @@ Interactively determine the next feature slug for personal workspace in the thou
    - From plan title: Extract feature name, convert to kebab-case
    - Fallback: Prompt without suggestion
 
-4. **Prompt User**:
-   - Show suggested slug: "Next slug: erik/0004-authentication-system"
-   - Ask: "Accept this slug or provide custom description?"
+4. **Prompt User with AskUserQuestion**:
+   - Show suggested slug as an option
+   - User can accept suggestion or select "Other" to provide custom description
+   - Example:
+     ```
+     AskUserQuestion:
+       question: "Choose feature slug description (will be: erik/0004-[description])"
+       header: "Feature Name"
+       options:
+         - "authentication-system" - Suggested based on context
+     ```
    - Validate: Only lowercase letters, numbers, hyphens
 
 5. **Return Result**:
@@ -48,11 +56,10 @@ NEXT_NUM=$(printf "%04d" $((10#${NEXT_NUM:-0} + 1)))
 # Suggest from context (research question, plan title)
 SUGGESTED_DESC=$(echo "$RESEARCH_QUESTION" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-\|-$//g')
 
-# Prompt user
-echo "Suggested slug: ${NAMESPACE}/${NEXT_NUM}-${SUGGESTED_DESC}"
-echo "Press Enter to accept, or type custom description:"
-read USER_DESC
-DESC=${USER_DESC:-$SUGGESTED_DESC}
+# Prompt user with AskUserQuestion
+# Present suggested slug as option, user can select "Other" for custom input
+# AskUserQuestion returns the selected value
+DESC="$SUGGESTED_DESC"  # Use result from AskUserQuestion
 
 # Create directory in personal namespace
 mkdir -p "thoughts/${NAMESPACE}/${NEXT_NUM}-${DESC}"
