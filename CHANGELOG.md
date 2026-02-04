@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Implement command uses agent orchestration workflow
 - Research/plan templates include namespace and sharing metadata
 - thoughts-locator/thoughts-analyzer agents search across namespaces
+- All user prompts now use selection interface (AskUserQuestion) instead of text input
 
 ### Migration
 
@@ -45,14 +46,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 4. Claude migrates documents to shared namespace:
    - Create `thoughts/shared/NNNN-description/` directories
-   - Copy documents (originals preserved in `thoughts/shared/research/`, `thoughts/shared/plans/`)
-   - Update frontmatter with `feature_slug: "shared/NNNN-description"`
-   - Fix cross-references to new paths
+   - Copy documents from legacy locations
+   - Update cross-references to point to new paths
+   - Documents remain unchanged otherwise
 
-5. Verify migration:
+5. Choose cleanup option:
+   - Delete original files from legacy locations (recommended)
+   - Keep original files as reference (optional)
+
+6. Verify migration:
    - Check new `thoughts/shared/NNNN-*/` directories
    - Test commands with new paths
-   - Original files remain in legacy locations
 
 **Version detection:**
 - v1.2.0/v1.2.2: Only `thoughts/shared/research/` and `thoughts/shared/plans/` exist

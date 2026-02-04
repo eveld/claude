@@ -2,7 +2,7 @@
 
 Research, planning, and implementation workflows for Claude Code.
 
-This plugin provides three workflow commands for codebase research, implementation planning, and execution. It includes 24 skills that guide Claude to use specialized agents instead of basic tools, and 17 agents with isolated contexts for focused tasks like codebase exploration and platform debugging.
+This plugin provides workflow commands for codebase research, implementation planning, and execution. It includes 29 skills that guide Claude to use specialized agents instead of basic tools, and 17 agents with isolated contexts for focused tasks like codebase exploration and platform debugging.
 
 The plugin automatically discovers project-specific commands and test patterns, generates structured documents, and provides tools for debugging GCP, Kubernetes, and Linear issues.
 
@@ -21,9 +21,11 @@ ln -s $(pwd) ~/.claude/plugins/workflows
 
 ## Commands
 
-- **`/workflows:research <question>`** - Research codebase using parallel agents, save to `thoughts/shared/research/`
-- **`/workflows:plan <research-file>`** - Create implementation plan, auto-discover project commands/tests, save to `thoughts/shared/plans/`
+- **`/workflows:research <question>`** - Research codebase using parallel agents, save to personal namespace
+- **`/workflows:plan <research-file>`** - Create implementation plan, auto-discover project commands/tests
 - **`/workflows:implement <plan-file>`** - Execute plan phase by phase with verification
+- **`/workflows:share-docs <path>`** - Share personal documents to team namespace
+- **`/workflows:upgrade`** - Upgrade plugin from older versions
 
 ### Directory Structure (v1.3.0+)
 
@@ -116,7 +118,7 @@ This keeps the main agent under 40k tokens per phase while enabling larger, more
 
 See `skills/spawn-implementation-agents/SKILL.md` for full pattern.
 
-## Skills (24)
+## Skills (29)
 
 Skills guide Claude's behavior automatically:
 
@@ -140,6 +142,11 @@ Skills guide Claude's behavior automatically:
 - `write-commit-message` - Conventional commit format
 - `write-pr-description` - Structured PR descriptions
 - `debug-systematically` - 6-step debugging process
+- `update-changelog` - Track implementation progress
+- `spawn-implementation-agents` - Orchestrate parallel agents
+- `determine-feature-slug` - Interactive feature naming
+- `share-docs` - Promote personal docs to shared namespace
+- `upgrade-plugin` - Handle version migrations
 
 See `skills/` directory for complete list.
 
